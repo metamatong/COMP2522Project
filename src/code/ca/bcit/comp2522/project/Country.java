@@ -1,3 +1,5 @@
+package ca.bcit.comp2522.project;
+
 /**
  * A class that represents country information used in the game.
  *

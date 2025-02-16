@@ -1,3 +1,5 @@
+package ca.bcit.comp2522.project;
+
 /**
  * A class that drives users to play three games presented by this project.
  *
