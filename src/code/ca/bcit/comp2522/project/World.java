@@ -93,6 +93,15 @@ class World
         this.countries = countriesMap;
     }
 
+    /**
+     * A getter for countries stored in World object.
+     * @return a map of countries with String keys and Country object values
+     */
+    public Map<String, Country> getCountries()
+    {
+        return this.countries;
+    }
+
     /*
      * Validates the countries map used in the World constructor.
      *
