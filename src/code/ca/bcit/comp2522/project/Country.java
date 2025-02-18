@@ -32,6 +32,36 @@ class Country
         this.facts = facts;
     }
 
+    /**
+     * Returns the name of the country.
+     *
+     * @return the country name.
+     */
+    public String getCountryName()
+    {
+        return name;
+    }
+
+    /**
+     * Returns the name of the capital city.
+     *
+     * @return the capital city name.
+     */
+    public String getCapitalCityName()
+    {
+        return capitalCityName;
+    }
+
+    /**
+     * Returns an array of facts about the country.
+     *
+     * @return the array of facts.
+     */
+    public String[] getFactsArray()
+    {
+        return facts;
+    }
+
     /*
      * validates String names used in Country class in the constructor.
      * @param name is the String name to be validated.
