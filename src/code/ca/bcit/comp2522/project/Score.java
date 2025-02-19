@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 
 /**
  * Represents the score details of a word game session.
- *
  * This class tracks the date/time the session was played, how many games
  * were played, the number of correct attempts (first and second),
  * and the number of incorrect attempts. It also provides a method
