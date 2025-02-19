@@ -72,7 +72,7 @@ public class Score
      *
      * @return the local date time for this object
      */
-    public LocalDateTime getDate()
+    public LocalDateTime getDateTime()
     {
         return this.currentTime;
     }
