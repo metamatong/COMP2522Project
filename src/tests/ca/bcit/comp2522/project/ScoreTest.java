@@ -1,3 +1,5 @@
+package ca.bcit.comp2522.project;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

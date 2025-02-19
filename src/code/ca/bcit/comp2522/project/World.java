@@ -139,7 +139,7 @@ class World
             }
 
             // Validate that the Country object itself is not null
-            if (country == null)
+            if(country == null)
             {
                 throw new IllegalArgumentException("Null Country cannot be used in the countries map.");
             }

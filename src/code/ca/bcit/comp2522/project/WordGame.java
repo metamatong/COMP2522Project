@@ -319,30 +319,16 @@ public class WordGame
         final LocalDateTime currentTime;
         currentTime = LocalDateTime.now();
 
-        final DateTimeFormatter formatter;
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        final Score currentScore = new Score(currentTime,
+                                             playedQuestionNumber,
+                                             firstAttemptCorrectNumber,
+                                             secondAttemptCorrectNumber,
+                                             thirdAttemptNumber);
 
-        final String formattedDateTime;
-        formattedDateTime = currentTime.format(formatter);
+        scores.add(currentScore);
 
-        final int totalScore;
-        totalScore = WEIGHT_FOR_FIRST_CORRECT_ATTEMPTS * firstAttemptCorrectNumber + secondAttemptCorrectNumber;
-        this.currentTotalScore = totalScore;
-
-        try(final FileWriter writer = new FileWriter(scoreFile, true))
-        {
-            writer.write(System.lineSeparator());
-            writer.write("Date and Time: " + formattedDateTime + "\n");
-            writer.write("Games Played: " + playedQuestionNumber + "\n");
-            writer.write("Correct First Attempts: " + firstAttemptCorrectNumber + "\n");
-            writer.write("Correct Second Attempts: " + secondAttemptCorrectNumber + "\n");
-            writer.write("Incorrect Attempts: " + thirdAttemptNumber + "\n");
-            writer.write("Total Score: " + totalScore + " points\n");
-        }
-        catch(final IOException e)
-        {
-            e.printStackTrace();
-        }
+        // Use the Score class's static method to append the score to file.
+        Score.appendScoreToFile(currentScore, scoreFile);
 
         int previousHighestScore;
         previousHighestScore = 0;
@@ -361,14 +347,6 @@ public class WordGame
                 previousHighestScoreTime = score.getDateTime();
             }
         }
-
-        final Score currentScore;
-        currentScore = new Score(currentTime,
-                playedQuestionNumber,
-                firstAttemptCorrectNumber,
-                secondAttemptCorrectNumber,
-                thirdAttemptNumber);
-        scores.add(currentScore);
 
         reportScores(currentScore, previousHighestScore, previousHighestScoreTime);
     }
