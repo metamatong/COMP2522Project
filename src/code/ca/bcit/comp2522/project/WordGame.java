@@ -98,6 +98,7 @@ public class WordGame
                         else
                         {
                             System.out.println("INCORRECT");
+                            System.out.println("The correct answer was " + answer);
                             thirdAttemptNumber++;
                         }
                     }
