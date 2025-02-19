@@ -1,8 +1,5 @@
 package ca.bcit.comp2522.project;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +125,6 @@ public class WordGame
                         validResponse = true;
                         break;
                     case "no":
-                        scanner.close();
                         saveScoresToFile();
                         return;
                     default:
@@ -315,7 +311,7 @@ public class WordGame
     private void saveScoresToFile()
     {
         final String scoreFileUrl;
-        scoreFileUrl = "res/scores/scores.txt";
+        scoreFileUrl = "src/res/scores/scores.txt";
 
         final LocalDateTime currentTime;
         currentTime = LocalDateTime.now();
