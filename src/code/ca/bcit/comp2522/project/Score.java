@@ -148,6 +148,21 @@ public class Score
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateTime = score.currentTime.format(formatter);
 
+        // Create a File object and ensure the file exists.
+        final File file;
+        file = new File(scoreFilePath);
+        try
+        {
+            if(!file.exists())
+            {
+                file.createNewFile();
+            }
+        }
+        catch(final IOException e)
+        {
+            e.printStackTrace();
+        }
+
         try (final FileWriter writer = new FileWriter(scoreFilePath, true))
         {
             writer.write(System.lineSeparator());
