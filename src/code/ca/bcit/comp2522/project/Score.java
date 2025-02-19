@@ -97,6 +97,42 @@ public class Score
     }
 
     /**
+     * Returns a string representation of this Score.
+     * <p>
+     * The format is:
+     * Date and Time: yyyy-MM-dd HH:mm:ss
+     * Games Played: [number]
+     * Correct First Attempts: [number]
+     * Correct Second Attempts: [number]
+     * Incorrect Attempts: [number]
+     * Score: [total score] points
+     * </p>
+     *
+     * @return a formatted string of the score details.
+     */
+    @Override
+    public String toString()
+    {
+        final DateTimeFormatter formatter;
+        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        return String.format(
+                "Date and Time: %s\n" +
+                        "Games Played: %d\n" +
+                        "Correct First Attempts: %d\n" +
+                        "Correct Second Attempts: %d\n" +
+                        "Incorrect Attempts: %d\n" +
+                        "Score: %d points\n",
+                currentTime.format(formatter),
+                numGamesPlayed,
+                numCorrectFirstAttempts,
+                numCorrectSecondAttempts,
+                numIncorrectTwoAttempts,
+                getScore()
+        );
+    }
+
+    /**
      * Appends the score details to the specified file.
      * <p>
      * The score is appended in a human-readable format, including the date/time,
