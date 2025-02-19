@@ -46,23 +46,36 @@ public class Score
     }
 
     /**
-     * Calculates and returns the average score based on the current
+     * Calculates and returns the total score based on the current
      * session data. The calculation uses a weighting factor for first
-     * attempts and then divides by the total number of games played.
+     * attempts.
      * <p>
      * The formula is:
-     * (2 * numCorrectFirstAttempts + numCorrectSecondAttempts) / numGamesPlayed
+     * WEIGHT_FOR_FIRST_CORRECT_ATTEMPTS * numCorrectFirstAttempts + numCorrectSecondAttempts
      *
+     *
+     * @return the total score for this session
+     */
+    public int getScore()
+    {
+        final int totalScore;
+        totalScore = WEIGHT_FOR_FIRST_CORRECT_ATTEMPTS * numCorrectFirstAttempts + numCorrectSecondAttempts;
+        return totalScore;
+    }
+
+    /**
+     * Calculates and returns the average score based on the current
+     * session data. The calculation divides total score by the total number of games played.
+     * <p>
+     * The formula is:
+     * totalScore / numGamesPlayed
      *
      * @return the average score for this session
      */
     public int getAverageScore()
     {
         final int averageScore;
-        averageScore = (WEIGHT_FOR_FIRST_CORRECT_ATTEMPTS *
-                        numCorrectFirstAttempts +
-                        numCorrectSecondAttempts) /
-                        numGamesPlayed;
+        averageScore = this.getScore() / numGamesPlayed;
         return averageScore;
     }
 
