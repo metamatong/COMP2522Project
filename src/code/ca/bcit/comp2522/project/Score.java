@@ -79,10 +79,10 @@ public class Score
      *
      * @return the average score for this session
      */
-    public int getAverageScore()
+    public double getAverageScore()
     {
-        final int averageScore;
-        averageScore = this.getScore() / numGamesPlayed;
+        final double averageScore;
+        averageScore = (double) this.getScore() / numGamesPlayed;
         return averageScore;
     }
 

@@ -20,15 +20,12 @@ import java.time.format.DateTimeFormatter;
 public class WordGame
 {
     private static final int NUMBER_OF_QUESTIONS = 10;
-    private static final int WEIGHT_FOR_FIRST_CORRECT_ATTEMPTS = 2;
-    private static List<Score> scores;
 
     private final World world;
-    private int playedQuestionNumber = 0;
+    private int playedGameNumber = 0;
     private int firstAttemptCorrectNumber = 0;
     private int secondAttemptCorrectNumber = 0;
     private int thirdAttemptNumber = 0;
-    private int currentTotalScore = 0;
 
     /**
      * Constructs a new WordGame and initializes the game world and score list.
@@ -38,7 +35,6 @@ public class WordGame
         final World world;
         world = new World();
         this.world = world;
-        this.scores = new ArrayList<>();
     }
 
     /**
@@ -104,9 +100,9 @@ public class WordGame
                 {
                     System.out.println("Failed to fetch question.");
                 }
-                playedQuestionNumber++;
             }
-            System.out.println(playedQuestionNumber + " word game played.");
+            playedGameNumber++;
+            System.out.println(playedGameNumber + " word game played.");
             System.out.println(firstAttemptCorrectNumber + " correct answers on the first attempt.");
             System.out.println(secondAttemptCorrectNumber + " correct answers on the second attempt.");
             System.out.println(thirdAttemptNumber + " incorrect answers on two attempts each.");
@@ -317,25 +313,24 @@ public class WordGame
         currentTime = LocalDateTime.now();
 
         final Score currentScore = new Score(currentTime,
-                                             playedQuestionNumber,
+                                             playedGameNumber,
                                              firstAttemptCorrectNumber,
                                              secondAttemptCorrectNumber,
                                              thirdAttemptNumber);
 
-        scores.add(currentScore);
 
-        // Use the Score class's static method to append the score to file.
-        Score.appendScoreToFile(currentScore, scoreFileUrl);
-
-        int previousHighestScore;
+        double previousHighestScore;
         previousHighestScore = 0;
 
         LocalDateTime previousHighestScoreTime;
         previousHighestScoreTime = LocalDateTime.now();
 
+        final List<Score> scores;
+        scores = Score.readScoresFromFile(scoreFileUrl);
+
         for(final Score score: scores)
         {
-            final int averageHighScore;
+            final double averageHighScore;
             averageHighScore = score.getAverageScore();
 
             if(averageHighScore > previousHighestScore)
@@ -344,6 +339,9 @@ public class WordGame
                 previousHighestScoreTime = score.getDateTime();
             }
         }
+
+        // This must be done before calculating previousHighestScore
+        Score.appendScoreToFile(currentScore, scoreFileUrl);
 
         reportScores(currentScore, previousHighestScore, previousHighestScoreTime);
     }
@@ -356,7 +354,7 @@ public class WordGame
      * @param previousHighestScoreTime the date and time when the previous high score was achieved.
      */
     private void reportScores(final Score currentScore,
-                              final int previousHighestScore,
+                              final double previousHighestScore,
                               final LocalDateTime previousHighestScoreTime)
     {
         final DateTimeFormatter formatterForDate;
