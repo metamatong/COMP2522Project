@@ -313,8 +313,8 @@ public class WordGame
      */
     private void saveScoresToFile()
     {
-        final File scoreFile;
-        scoreFile = new File("res/scores/scores.txt");
+        final String scoreFileUrl;
+        scoreFileUrl = "res/scores/scores.txt";
 
         final LocalDateTime currentTime;
         currentTime = LocalDateTime.now();
@@ -328,7 +328,7 @@ public class WordGame
         scores.add(currentScore);
 
         // Use the Score class's static method to append the score to file.
-        Score.appendScoreToFile(currentScore, scoreFile);
+        Score.appendScoreToFile(currentScore, scoreFileUrl);
 
         int previousHighestScore;
         previousHighestScore = 0;
