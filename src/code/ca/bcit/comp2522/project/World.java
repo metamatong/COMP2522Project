@@ -35,7 +35,6 @@ class World
         final HashMap<String, Country> countriesMap;
         countriesMap = new HashMap<>();
 
-        // Loop over files from "a.txt" to "z.txt"
         for(char letter = 'a'; letter <= 'z'; letter++)
         {
             final String fileName;
