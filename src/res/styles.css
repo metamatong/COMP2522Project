@@ -1,0 +1,43 @@
+/* Root container styling: gives the entire scene a nice background and padding */
+.root {
+    -fx-background-color: linear-gradient(to bottom, #d2fdff, #26FFE6);
+    -fx-padding: 15px;
+    -fx-font-family: "Arial";
+}
+
+/* Labels: slightly larger text, white color for contrast */
+.label {
+    -fx-font-size: 12px;
+    -fx-text-fill: black;
+}
+
+/* Buttons: a bright base color, bold text, and a simple hover effect */
+.button {
+    -fx-background-color: #127eaf;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-border-color: #000000;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+    -fx-padding: 5 15 5 15; /* top, right, bottom, left */
+}
+
+/* Hover effect for buttons */
+.button:hover {
+    -fx-background-color: #4c86e4;
+    -fx-border-color: #07244e;
+}
+
+/* HBox styling to space items nicely */
+.hbox {
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+}
+
+/* VBox styling to space items nicely */
+.vbox {
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+}

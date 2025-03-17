@@ -6,8 +6,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -26,12 +28,12 @@ public class NumberGame extends Application
     private static final int COLS = 5;
     private static final int TOTAL_NUMBERS_TO_PLACE = 20;
     private static final int NUMBER_UPPERBOUND = 1000;
-    private static final int ZERO_INDEX = 0;
+    private static final int ZERO_VALUE = 0;
     private static final int SCENE_WIDTH = 400;
     private static final int SCENE_HEIGTH = 300;
     private static final int HBOX_HEIGHT = 20;
     private static final int VBOX_WIDTH = 10;
-    private static final int BUTTON_MIN_WIDTH = 50;
+    private static final int BUTTON_MIN_WIDTH = 60;
 
 
     // Embedded scoreboard
@@ -61,6 +63,23 @@ public class NumberGame extends Application
         GridPane gridPane = new GridPane();
         gridPane.setHgap(5);
         gridPane.setVgap(5);
+        gridPane.setMaxWidth(Double.MAX_VALUE);
+        gridPane.setMaxHeight(Double.MAX_VALUE);
+
+        for(int i = 0; i < COLS; i++)
+        {
+            final ColumnConstraints cc;
+            cc = new ColumnConstraints();
+            cc.setPercentWidth(100.0 / COLS);
+            gridPane.getColumnConstraints().add(cc);
+        }
+
+        for(int i = 0; i < ROWS; i++)
+        {
+            RowConstraints rc = new RowConstraints();
+            rc.setPercentHeight(100.0 / ROWS);
+            gridPane.getRowConstraints().add(rc);
+        }
 
         for(int r = 0; r < ROWS; r++)
         {
@@ -80,7 +99,6 @@ public class NumberGame extends Application
 
         tryAgainButton = new Button("Try Again");
         tryAgainButton.setOnAction(e -> {
-            // If the user chooses "Try Again", reset the game
             resetGame();
         });
 
@@ -98,17 +116,23 @@ public class NumberGame extends Application
             primaryStage.close();
         });
 
-        final HBox topBar;
-        topBar = new HBox(HBOX_HEIGHT, nextNumberLabel, statusLabel);
+        final VBox topBar;
+        topBar = new VBox(VBOX_WIDTH, nextNumberLabel, statusLabel);
         final HBox bottomBar;
         bottomBar = new HBox(HBOX_HEIGHT, tryAgainButton, quitButton);
 
         final VBox root;
         root = new VBox(VBOX_WIDTH, topBar, gridPane, bottomBar);
+        root.setFillWidth(true);
+
         final Scene scene;
         scene = new Scene(root, SCENE_WIDTH, SCENE_HEIGTH);
+        scene.getStylesheets().add(
+                getClass().getResource("/styles.css").toExternalForm()
+        );
 
         primaryStage.setTitle("Number Game");
+        primaryStage.setResizable(true);
         primaryStage.setScene(scene);
         primaryStage.show();
 
@@ -153,7 +177,7 @@ public class NumberGame extends Application
         // Clear the board array
         for(int i = 0; i < board.length; i++)
         {
-            board[i] = ZERO_INDEX;
+            board[i] = ZERO_VALUE;
         }
         // Clear all button labels
         for(int r = 0; r < ROWS; r++)
@@ -163,7 +187,7 @@ public class NumberGame extends Application
                 buttons[r][c].setText("");
             }
         }
-        numbersPlaced = ZERO_INDEX;
+        numbersPlaced = ZERO_VALUE;
         gameOver = false;
 
         statusLabel.setText("Status: Playing...");
@@ -205,7 +229,7 @@ public class NumberGame extends Application
         }
 
         int boardIndex = rowIndex * COLS + colIndex;
-        if(board[boardIndex] != ZERO_INDEX)
+        if(board[boardIndex] != ZERO_VALUE)
         {
             // Already has a number, ignore
             return;
@@ -219,7 +243,7 @@ public class NumberGame extends Application
         {
             // This breaks ascending order => lose
             gameOver = true;
-            board[boardIndex] = ZERO_INDEX; // revert
+            board[boardIndex] = ZERO_VALUE; // revert
             incrementLosses();
             addToTotalPlacements(numbersPlaced);
             statusLabel.setText("Status: You lose! No place for " + nextNumber);
@@ -250,7 +274,7 @@ public class NumberGame extends Application
             incrementLosses();
             addToTotalPlacements(numbersPlaced);
             statusLabel.setText("Status: You lose! Next was " + nextNumber
-                    + " but there's no valid spot.");
+                    + "\n but there's no valid spot.");
             return;
         }
 
@@ -289,15 +313,17 @@ public class NumberGame extends Application
         return true;
     }
 
-    private boolean canPlaceNextNumber(final int n, final int[] arr) {
+    private boolean canPlaceNextNumber(final int n, final int[] arr)
+    {
         // Try placing 'n' in each empty spot; revert after test
         for(int i = 0; i < arr.length; i++)
         {
-            if(arr[i] == ZERO_INDEX)
+            if(arr[i] == ZERO_VALUE)
             {
                 arr[i] = n;
-                boolean ascending = isBoardAscending(arr);
-                arr[i] = ZERO_INDEX; // revert
+                final boolean ascending;
+                ascending = isBoardAscending(arr);
+                arr[i] = ZERO_VALUE;
                 if(ascending)
                 {
                     return true;
