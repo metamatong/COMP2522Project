@@ -40,7 +40,7 @@ class Main
             }
             else if(input.equalsIgnoreCase("n"))
             {
-                System.out.println("Number game is not implemented yet.");
+                NumberGame.main(new String[]{});
             }
             else if(input.equalsIgnoreCase("m"))
             {
