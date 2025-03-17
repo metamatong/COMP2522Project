@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -13,6 +14,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -30,11 +32,12 @@ public class NumberGame extends Application
     private static final int NUMBER_UPPERBOUND = 1000;
     private static final int ZERO_VALUE = 0;
     private static final int SCENE_WIDTH = 400;
-    private static final int SCENE_HEIGTH = 300;
+    private static final int SCENE_HEIGTH = 260;
     private static final int HBOX_HEIGHT = 20;
     private static final int VBOX_WIDTH = 10;
     private static final int BUTTON_MIN_WIDTH = 60;
-
+    private static final int BUTTON_MIN_HEIGHT = 40;
+    private Stage primaryStage;
 
     // Embedded scoreboard
     private BasicScoreboard scoreboard;
@@ -42,9 +45,7 @@ public class NumberGame extends Application
     // UI components
     private final Button[][] buttons = new Button[ROWS][COLS];
     private Label nextNumberLabel;
-    private Label statusLabel; // shows "You win!" or "You lose!"
-    private Button tryAgainButton;
-    private Button quitButton;
+    private Label statusLabel;
 
     // Board data: 20 slots, 0 means "empty"
     private final int[] board = new int[ROWS * COLS];
@@ -58,6 +59,7 @@ public class NumberGame extends Application
     @Override
     public void start(final Stage primaryStage)
     {
+        this.primaryStage = primaryStage;
         scoreboard = new BasicScoreboard();
 
         GridPane gridPane = new GridPane();
@@ -88,6 +90,7 @@ public class NumberGame extends Application
                 final Button b;
                 b = new Button("");
                 b.setMinWidth(BUTTON_MIN_WIDTH);
+                b.setMinHeight(BUTTON_MIN_HEIGHT);
                 b.setOnAction(this);  // all buttons use the same event handler
                 gridPane.add(b, c, r);
                 buttons[r][c] = b;
@@ -97,29 +100,10 @@ public class NumberGame extends Application
         nextNumberLabel = new Label("Next number: ");
         statusLabel = new Label("Status: Playing...");
 
-        tryAgainButton = new Button("Try Again");
-        tryAgainButton.setOnAction(e -> {
-            resetGame();
-        });
-
-        quitButton = new Button("Quit");
-        quitButton.setOnAction(e -> {
-            // Show final scoreboard, then close the stage (return to Main menu in a bigger app)
-            final Alert alert;
-            alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Final Scoreboard");
-            alert.setHeaderText("Your final results:");
-            alert.setContentText(getScoreboardSummary());
-            alert.showAndWait();
-
-            // Close this stage/window.
-            primaryStage.close();
-        });
-
         final VBox topBar;
         topBar = new VBox(VBOX_WIDTH, nextNumberLabel, statusLabel);
         final HBox bottomBar;
-        bottomBar = new HBox(HBOX_HEIGHT, tryAgainButton, quitButton);
+        bottomBar = new HBox(HBOX_HEIGHT);
 
         final VBox root;
         root = new VBox(VBOX_WIDTH, topBar, gridPane, bottomBar);
@@ -241,12 +225,13 @@ public class NumberGame extends Application
         // Check if still ascending
         if(!isBoardAscending(board))
         {
-            // This breaks ascending order => lose
+            // When the game is over due to an invalid move:
             gameOver = true;
-            board[boardIndex] = ZERO_VALUE; // revert
+            board[boardIndex] = ZERO_VALUE; // revert the move
             incrementLosses();
             addToTotalPlacements(numbersPlaced);
             statusLabel.setText("Status: You lose! No place for " + nextNumber);
+            showGameOverDialog(primaryStage);
             return;
         }
 
@@ -275,6 +260,7 @@ public class NumberGame extends Application
             addToTotalPlacements(numbersPlaced);
             statusLabel.setText("Status: You lose! Next was " + nextNumber
                     + "\n but there's no valid spot.");
+            showGameOverDialog(primaryStage);
             return;
         }
 
@@ -331,6 +317,31 @@ public class NumberGame extends Application
             }
         }
         return false;
+    }
+
+    private void showGameOverDialog(final Stage stage)
+    {
+        final Alert gameOverAlert;
+        gameOverAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        gameOverAlert.setTitle("Game Over");
+        gameOverAlert.setHeaderText("Game Over");
+        gameOverAlert.setContentText(statusLabel.getText() + "\nWould you like to try again or quit?");
+        final ButtonType tryAgainOption;
+        tryAgainOption = new ButtonType("Try Again");
+        final ButtonType quitOption;
+        quitOption = new ButtonType("Quit");
+        gameOverAlert.getButtonTypes().setAll(tryAgainOption, quitOption);
+
+        final Optional<ButtonType> result;
+        result = gameOverAlert.showAndWait();
+        if(result.isPresent() && result.get() == tryAgainOption)
+        {
+            resetGame();
+        }
+        else
+        {
+            stage.close();
+        }
     }
 
     public static void main(final String[] args)
