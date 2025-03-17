@@ -1,8 +1,10 @@
 package ca.bcit.comp2522.project;
+
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
@@ -42,7 +44,7 @@ public class RedLightGreenLight {
     private static long lightTimer = 0;
     private static long nextSwitch = 2000; // Initial 2 seconds
     private static boolean gameOver = false;
-    private static Random random = new Random();
+    private static final Random random = new Random();
     private static Screen screen;
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -51,10 +53,58 @@ public class RedLightGreenLight {
         screen = new TerminalScreen(terminal);
         screen.startScreen();
 
-        // Initialize players
-        initializePlayers();
+        // Show intro or menu
+        boolean wantsToPlay = showIntro();
+        if (!wantsToPlay) {
+            // User chose to exit or not start
+            screen.stopScreen();
+            return;
+        }
 
-        // Game loop
+        // Now actually start the game
+        initializePlayers();
+        runGameLoop();
+    }
+
+    /**
+     * Displays a simple intro screen with a 'Play' prompt.
+     * Returns true if the user wants to start the game, false if they want to exit.
+     */
+    private static boolean showIntro() throws IOException {
+        screen.clear();
+        TextGraphics tg = screen.newTextGraphics();
+
+        String title = "WELCOME TO RED LIGHT GREEN LIGHT";
+        String instructions = "Press ENTER to PLAY or ESC to EXIT";
+
+        int centerX = WIDTH / 2 - (title.length() / 2);
+        int centerY = HEIGHT / 2;
+
+        // Draw the title
+        tg.putString(Math.max(0, centerX), Math.max(0, centerY - 1), title);
+        // Draw instructions
+        int instructionsX = WIDTH / 2 - (instructions.length() / 2);
+        tg.putString(Math.max(0, instructionsX), Math.max(0, centerY + 1), instructions);
+
+        screen.refresh();
+
+        // Wait for user to press Enter or ESC
+        while (true) {
+            KeyStroke keyStroke = screen.readInput();
+            if (keyStroke != null) {
+                if (keyStroke.getKeyType() == KeyType.Enter) {
+                    return true;  // Start game
+                } else if (keyStroke.getKeyType() == KeyType.Escape) {
+                    return false; // Exit game
+                }
+            }
+        }
+    }
+
+    /**
+     * The main game loop logic.
+     */
+    private static void runGameLoop() throws IOException, InterruptedException {
         while (!gameOver) {
             // Set previous positions
             for (Player p : players) {
@@ -67,10 +117,18 @@ public class RedLightGreenLight {
             if (key != null) {
                 Direction dir = null;
                 switch (key.getKeyType()) {
-                    case ArrowUp: dir = Direction.UP; break;
-                    case ArrowDown: dir = Direction.DOWN; break;
-                    case ArrowLeft: dir = Direction.LEFT; break;
-                    case ArrowRight: dir = Direction.RIGHT; break;
+                    case ArrowUp:
+                        dir = Direction.UP;
+                        break;
+                    case ArrowDown:
+                        dir = Direction.DOWN;
+                        break;
+                    case ArrowLeft:
+                        dir = Direction.LEFT;
+                        break;
+                    case ArrowRight:
+                        dir = Direction.RIGHT;
+                        break;
                 }
                 if (dir != null) {
                     attemptMove(user, dir);
@@ -97,26 +155,27 @@ public class RedLightGreenLight {
             screen.clear();
             TextGraphics tg = screen.newTextGraphics();
 
-            // Draw light machine
+            // Draw light machine at the top
             for (int x = 0; x < WIDTH; x++) {
-                TextCharacter greenStar = new TextCharacter('*')
-                        .withForegroundColor(TextColor.ANSI.GREEN)
+                // If isGreen is true, draw green, otherwise draw red
+                TextCharacter starChar = new TextCharacter('*')
+                        .withForegroundColor(isGreen ? TextColor.ANSI.GREEN : TextColor.ANSI.RED)
                         .withBackgroundColor(TextColor.ANSI.BLACK);
 
-                tg.setCharacter(x, 0, greenStar);
+                tg.setCharacter(x, 0, starChar);
             }
+
             // Draw players
             for (Player p : players) {
                 if (!p.isEliminated) {
                     char c = p.isUser ? 'P' : 'N';
-
                     TextCharacter character = new TextCharacter(c)
                             .withForegroundColor(TextColor.ANSI.WHITE)
                             .withBackgroundColor(TextColor.ANSI.BLACK);
-
                     tg.setCharacter(p.x, p.y, character);
                 }
             }
+
             screen.refresh();
 
             // Check eliminations during red light
@@ -144,7 +203,7 @@ public class RedLightGreenLight {
                 nextSwitch = 2000 + random.nextInt(3000); // 2 to 5 seconds
             }
 
-            Thread.sleep(50); // 20 fps
+            Thread.sleep(50); // ~20 fps
         }
 
         // Display game over message
@@ -182,10 +241,18 @@ public class RedLightGreenLight {
     private static void attemptMove(Player p, Direction dir) {
         int dx = 0, dy = 0;
         switch (dir) {
-            case UP: dy = -1; break;
-            case DOWN: dy = 1; break;
-            case LEFT: dx = -1; break;
-            case RIGHT: dx = 1; break;
+            case UP:
+                dy = -1;
+                break;
+            case DOWN:
+                dy = 1;
+                break;
+            case LEFT:
+                dx = -1;
+                break;
+            case RIGHT:
+                dx = 1;
+                break;
         }
 
         int newX = p.x + dx;
@@ -196,12 +263,13 @@ public class RedLightGreenLight {
             return;
         }
 
-        // Check occupancy
+        // Check if position is already occupied
         Player occupant = getPlayerAt(newX, newY);
         if (occupant == null) {
             p.x = newX;
             p.y = newY;
         } else {
+            // Attempt to push occupant
             int pushX = newX + dx;
             int pushY = newY + dy;
             if (pushX >= 0 && pushX < WIDTH && pushY >= 0 && pushY < HEIGHT && getPlayerAt(pushX, pushY) == null) {
