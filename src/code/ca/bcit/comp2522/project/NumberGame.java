@@ -24,7 +24,8 @@ import java.util.Random;
  * @version 1.0
  */
 public class NumberGame extends Application
-        implements javafx.event.EventHandler<javafx.event.ActionEvent> {
+        implements javafx.event.EventHandler<javafx.event.ActionEvent>
+{
 
     private static final int ROWS = 4;
     private static final int COLS = 5;
@@ -62,7 +63,8 @@ public class NumberGame extends Application
         this.primaryStage = primaryStage;
         scoreboard = new BasicScoreboard();
 
-        GridPane gridPane = new GridPane();
+        final GridPane gridPane;
+        gridPane = new GridPane();
         gridPane.setHgap(5);
         gridPane.setVgap(5);
         gridPane.setMaxWidth(Double.MAX_VALUE);
@@ -78,7 +80,8 @@ public class NumberGame extends Application
 
         for(int i = 0; i < ROWS; i++)
         {
-            RowConstraints rc = new RowConstraints();
+            final RowConstraints rc;
+            rc = new RowConstraints();
             rc.setPercentHeight(100.0 / ROWS);
             gridPane.getRowConstraints().add(rc);
         }
