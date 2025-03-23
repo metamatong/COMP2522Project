@@ -59,6 +59,12 @@ public class NumberGame extends Application
     private int numbersPlaced;   // How many we've successfully placed so far
     private boolean gameOver;    // true if player has won or lost already
 
+
+    /**
+     * Sets up and displays the JavaFX UI for the Number Game.
+     *
+     * @param primaryStage the main Stage for this JavaFX application
+     */
     @Override
     public void start(final Stage primaryStage)
     {
@@ -131,26 +137,45 @@ public class NumberGame extends Application
     // Scoreboard Delegation
     // ---------------------
 
+    /**
+     * Increments the count of games played by 1 in the scoreboard.
+     */
     public void incrementGamesPlayed()
     {
         scoreboard.incrementGamesPlayed();
     }
 
+    /**
+     * Increments the count of wins by 1 in the scoreboard.
+     */
     public void incrementWins()
     {
         scoreboard.incrementWins();
     }
 
+    /**
+     * Increments the count of losses by 1 in the scoreboard.
+     */
     public void incrementLosses()
     {
         scoreboard.incrementLosses();
     }
 
+    /**
+     * Adds a given number to the scoreboard's total placements.
+     *
+     * @param placementsThisGame the number of placements to add
+     */
     public void addToTotalPlacements(final int placementsThisGame)
     {
         scoreboard.addToTotalPlacements(placementsThisGame);
     }
 
+    /**
+     * Retrieves a summary of the scoreboard's statistics.
+     *
+     * @return a string representing the scoreboard data
+     */
     public String getScoreboardSummary()
     {
         return scoreboard.getScoreboardSummary();
@@ -160,6 +185,16 @@ public class NumberGame extends Application
     // Game Methods
     // -------------
 
+    /**
+     * Resets the game to a clean state:
+     * <ul>
+     *     <li>Clears the board array.</li>
+     *     <li>Clears all button labels.</li>
+     *     <li>Resets relevant counters.</li>
+     *     <li>Generates a fresh random number to place first.</li>
+     *     <li>Increments 'games played' in the scoreboard.</li>
+     * </ul>
+     */
     public void resetGame() {
         // Clear the board array
         Arrays.fill(board, ZERO_VALUE);
@@ -182,6 +217,13 @@ public class NumberGame extends Application
         incrementGamesPlayed();
     }
 
+    /**
+     * Main event handler for the grid buttons. Places the next number if valid,
+     * checks for ascending order, and updates the UI. If an invalid move is made,
+     * it will signal a loss. If the board is filled, it signals a win.
+     *
+     * @param event the event triggered by clicking on a grid Button.
+     */
     @Override
     public void handle(final ActionEvent event)
     {
@@ -270,16 +312,31 @@ public class NumberGame extends Application
     // Helper Utilities
     // ----------------
 
+    /*
+     * Generates a random integer in the range [1, NUMBER_UPPERBOUND].
+     *
+     * @return a random integer from 1 to NUMBER_UPPERBOUND (inclusive)
+     */
     private int getRandomNumber()
     {
         return random.nextInt(NUMBER_UPPERBOUND) + 1;
     }
 
+    /*
+     * Updates the nextNumberLabel to display the nextNumber.
+     */
     private void updateNextNumberLabel()
     {
         nextNumberLabel.setText("Next number: " + nextNumber);
     }
 
+    /*
+     * Checks whether the given array of integers (representing the board)
+     * is in strictly ascending order, ignoring zeroes.
+     *
+     * @param arr the board array to check
+     * @return true if all non-zero values are in strictly ascending order; false otherwise
+     */
     private boolean isBoardAscending(final int[] arr)
     {
         int[] nonZero = Arrays.stream(arr)
@@ -289,6 +346,15 @@ public class NumberGame extends Application
                 .allMatch(i -> nonZero[i] > nonZero[i - 1]);
     }
 
+    /*
+     * Tries placing a hypothetical number into each empty spot. If at least one
+     * placement leads to a strictly ascending board, then it's possible to place
+     * this number.
+     *
+     * @param n   the candidate number to place
+     * @param arr the board array
+     * @return true if there is at least one valid spot; false otherwise
+     */
     private boolean canPlaceNextNumber(final int n, final int[] arr)
     {
         return IntStream.range(0, arr.length).anyMatch(i ->
@@ -305,6 +371,13 @@ public class NumberGame extends Application
         });
     }
 
+    /*
+     * Shows a dialog indicating that the game is over, then asks the user if they want
+     * to reset or quit. If the user chooses "Try Again," a new game is started via
+     * resetGame(); otherwise, the application window is closed.
+     *
+     * @param stage the main stage on which to show the dialog
+     */
     private void showGameOverDialog(final Stage stage)
     {
         final Alert gameOverAlert;
@@ -330,6 +403,11 @@ public class NumberGame extends Application
         }
     }
 
+    /**
+     * The main entry point of the JavaFX application.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(final String[] args)
     {
         launch(args);
