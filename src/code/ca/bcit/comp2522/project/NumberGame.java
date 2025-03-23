@@ -16,6 +16,8 @@ import javafx.stage.Stage;
 
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.IntStream;
+import java.util.Arrays;
 
 /**
  * Concrete NumberGame that uses a BasicScoreboard for tracking stats and runs a JavaFX GUI.
@@ -70,35 +72,33 @@ public class NumberGame extends Application
         gridPane.setMaxWidth(Double.MAX_VALUE);
         gridPane.setMaxHeight(Double.MAX_VALUE);
 
-        for(int i = 0; i < COLS; i++)
+        IntStream.range(0, COLS).forEach(i ->
         {
             final ColumnConstraints cc;
             cc = new ColumnConstraints();
             cc.setPercentWidth(100.0 / COLS);
             gridPane.getColumnConstraints().add(cc);
-        }
+        });
 
-        for(int i = 0; i < ROWS; i++)
+        IntStream.range(0, ROWS).forEach(i ->
         {
             final RowConstraints rc;
             rc = new RowConstraints();
             rc.setPercentHeight(100.0 / ROWS);
             gridPane.getRowConstraints().add(rc);
-        }
+        });
 
-        for(int r = 0; r < ROWS; r++)
-        {
-            for(int c = 0; c < COLS; c++)
-            {
-                final Button b;
-                b = new Button("");
-                b.setMinWidth(BUTTON_MIN_WIDTH);
-                b.setMinHeight(BUTTON_MIN_HEIGHT);
-                b.setOnAction(this);  // all buttons use the same event handler
-                gridPane.add(b, c, r);
-                buttons[r][c] = b;
-            }
-        }
+        IntStream.range(0, ROWS).forEach(r ->
+                IntStream.range(0, COLS).forEach(c ->
+                {
+                    Button b = new Button("");
+                    b.setMinWidth(BUTTON_MIN_WIDTH);
+                    b.setMinHeight(BUTTON_MIN_HEIGHT);
+                    b.setOnAction(this);
+                    gridPane.add(b, c, r);
+                    buttons[r][c] = b;
+                })
+        );
 
         nextNumberLabel = new Label("Next number: ");
         statusLabel = new Label("Status: Playing...");
@@ -162,18 +162,13 @@ public class NumberGame extends Application
 
     public void resetGame() {
         // Clear the board array
-        for(int i = 0; i < board.length; i++)
-        {
-            board[i] = ZERO_VALUE;
-        }
+        Arrays.fill(board, ZERO_VALUE);
+
         // Clear all button labels
-        for(int r = 0; r < ROWS; r++)
-        {
-            for(int c = 0; c < COLS; c++)
-            {
-                buttons[r][c].setText("");
-            }
-        }
+        Arrays.stream(buttons)
+                .forEach(row -> Arrays.stream(row)
+                        .forEach(button -> button.setText("")));
+
         numbersPlaced = ZERO_VALUE;
         gameOver = false;
 
@@ -287,25 +282,16 @@ public class NumberGame extends Application
 
     private boolean isBoardAscending(final int[] arr)
     {
-        int last = -1; // track last non-zero
-        for(int value : arr)
-        {
-            if(value != 0)
-            {
-                if(value <= last)
-                {
-                    return false;
-                }
-                last = value;
-            }
-        }
-        return true;
+        int[] nonZero = Arrays.stream(arr)
+                .filter(v -> v != 0)
+                .toArray();
+        return IntStream.range(1, nonZero.length)
+                .allMatch(i -> nonZero[i] > nonZero[i - 1]);
     }
 
     private boolean canPlaceNextNumber(final int n, final int[] arr)
     {
-        // Try placing 'n' in each empty spot; revert after test
-        for(int i = 0; i < arr.length; i++)
+        return IntStream.range(0, arr.length).anyMatch(i ->
         {
             if(arr[i] == ZERO_VALUE)
             {
@@ -313,13 +299,10 @@ public class NumberGame extends Application
                 final boolean ascending;
                 ascending = isBoardAscending(arr);
                 arr[i] = ZERO_VALUE;
-                if(ascending)
-                {
-                    return true;
-                }
+                return ascending;
             }
-        }
-        return false;
+            return false;
+        });
     }
 
     private void showGameOverDialog(final Stage stage)
