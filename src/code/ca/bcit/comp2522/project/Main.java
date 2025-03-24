@@ -20,7 +20,7 @@ class Main
             System.out.println("\nMenu:");
             System.out.println("Press W to play the Word game.");
             System.out.println("Press N to play the Number game.");
-            System.out.println("Press M to play the <your game's name> game.");
+            System.out.println("Press M to play the Red Light Blood Light.");
             System.out.println("Press Q to quit.");
             System.out.print("Enter your choice: ");
 

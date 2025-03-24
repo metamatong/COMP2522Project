@@ -11,9 +11,11 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -37,8 +39,11 @@ public class RedLightGreenLight {
 
     private enum Direction { UP, DOWN, LEFT, RIGHT }
 
-    private static final int WIDTH = 20;
-    private static final int HEIGHT = 20;
+    private static final int WIDTH = 60;  // bigger than 20
+    private static final int HEIGHT = 25; // bigger than 20
+    private static int xOffset = 0; // Where to start drawing in the terminal (left offset)
+    private static int yOffset = 0; // Where to start drawing in the terminal (top offset)
+
     private static List<Player> players;
     private static Player user;
     private static boolean isGreen = true;
@@ -64,9 +69,38 @@ public class RedLightGreenLight {
             return;
         }
 
+        // CENTERING CHANGES: Now that the user is starting the game, figure out the offsets
+        TerminalSize size = screen.getTerminalSize(); // e.g. 120 x 40
+        int columns = size.getColumns();
+        int rows = size.getRows();
+        xOffset = (columns - WIDTH) / 2;  // center horizontally
+        yOffset = (rows - HEIGHT) / 2;    // center vertically
+
         // Now actually start the game
         initializePlayers();
         runGameLoop();
+    }
+
+    /*
+     * Loads the ASCII art logo from the resource file.
+     *
+     * @return an array of strings, each representing a line of the logo.
+     * @throws IOException if the file cannot be read.
+     */
+    private static String[] loadLogo() throws IOException {
+        List<String> lines = new ArrayList<>();
+        // Use the class loader to get the resource as an InputStream.
+        try (InputStream is = RedLightGreenLight.class.getResourceAsStream("/logo.txt");
+             BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+            if (is == null) {
+                throw new IOException("Logo resource not found!");
+            }
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        }
+        return lines.toArray(new String[0]);
     }
 
     /**
@@ -78,51 +112,11 @@ public class RedLightGreenLight {
         TextGraphics tg = screen.newTextGraphics();
 
         TerminalSize size = screen.getTerminalSize();
-        int columns = size.getColumns();
-        int rows = size.getRows();
+        int columns = size.getColumns(); // 120
+        int rows = size.getRows();       // 40
 
-// ASCII art logo as an array of strings.
-        String[] logo = {
-                "@@##@@@#@@@@@@@@@@@%*+++======----::::::::::::::::::::--------------:::::::::::::::.......::...:::::::::............................:-%@@@@@@@@@+------------",
-                "@@@**@@#%@@@@@@@@@%#*+++======----::::::::::::::::::::::-------------:::::::::::::::::...::::::::::::::..............................:-%*@*+#%+*-.:-:...-----",
-                "@@@@@@@%#@@@@@@@@@#**+++=====----:::::::::::::::::::::----------------::::::::::::::::....:::::.::....................................:=:.-:+@+%...:....-----",
-                "@%@@@@@@@%@@@@@@@%**+++++====----::::::::::::::::-----=-==========------:::::::::::::.....:::-:::::::::::::::::........................:.%##*@@@#=:::.:.:----",
-                "@@#@@@@#@@@@@@@@@#**+++++====----:::----------:------=========+++==------:::::::::::.....::---------:::----:::::::::::.................::+@@@@@@@+-----------",
-                "#*@%%@@@@@@@@@@@%**++++++====---------::::::::::::--------========--------:::::::::......::::::::::::::::::::::::::::::::::::..........:::@@@@@@@*-----------",
-                "@+%@@+@%%@@@@@@@#**+++++++=====---------------------=================-----::::::::.......:::::::::::--------------:::::::..............:::#@@@@@@*-----------",
-                "@%=#@@@%%@@@@@@@#**++++++++=====--------------=======+++++++++++=======----::::::::....:::::::::-----============-----:::::::.............+@@@@@@*-----------",
-                "#@@*%@@@@@@@@@@@#*****++++++========--------========+++*********+++++====---::::::...::::::::----=================-----::::::::::........:-@@@@@@+-----------",
-                "#@@@@@@@@@@@@@@@**********++++======-------------====+++***#######**+++==---::::::...::::::---=================--------::::::::::::.....:::@@@@@%=-----------",
-                "@@@@%@@@@@@@@@@@***********++++=====-----:::::::::--==++++**########**++==--::::::...:::::---===============---:::::::::::::::::::::....:::@@@@@#------------",
-                "*%@@@@@@@@@@@@@@***********++++=====----:::::::...:::-==+++***########*++==--:::......::::---=============-----::::::::::::::::::::::...:::#@@@@+------------",
-                "@@%%@@%%@@@@@@@@************+++++++*#%%@@@@@@%%#+=-:::::=+++***#######**+==-:::........::::----========---=+*#%@@@@@@@@@%#+==--:::::::.::.:*@@@%+------------",
-                "@@@#@@@%@@@%@@@@**************##%@@@@@@@@@@@@@@@@@@@#+-:::-+****#######*+==-::..........:::-------=----+#@@@%#*+=----=+#@@@@@%*+=-::::.::.:+@@@@@@%#**+=-----",
-                "@@@@%@@@@@@%#@@%*********##%%@@@@@@@@@%#*#@@@@@@@@@@@@@#=:::=+**#######*+==-::..........::::::------=+%@%+-...:=*##++=:. .:*%@@@%*=:::....:=@@@@@@@@@@@@%%#*=",
-                "@@@@@@@@@@@@@@@@********#%@@@@@@@@#+-:.:%@@@@%%#+:.+%%@@@#-::-=+*######*+==-::............::::::::-=#%*-::...*@@@%#: -*#*....:#@@@#+-:....:=@@@@@@@@@@@@@@@@@",
-                "@#@@@@@@@@@@@@@@*****++*%@@@@@@#+=--:.=@@@@@@@%%#*=+#%*#@@@*-::=+#####*++=--::..............:::::-+%#+-:...:#@@@@@@%##%@@@+....=@@@%+:....:-@@@@@@@@@@@@@@@@@",
-                "@@@@@@@@@@@@@@@@****+==+#@@@@@*++=--::@@@@@@@@%%%@@@@@#:*%@@@+--=+****++==--:..................:-*%#*=-:...*@@@@@@@%%@@@@@@-...-#%#*=:.....:@%-=+@@@@@@@@@@@@",
-                "@@@@@@@@@@@@@@@@***+=====+==+##*++=--=@@@@@@@@@@@@@@@@@:.#@@@@*==+++++===---:.................:-#@%#+=-:...#@@@@@@@@@@@@@@@#..:=*-:........:@*------=*@@@@@@@",
-                ":@@@@@@@@@@@@@@%***+==--==--:..-+*+==-@@@@@@@#@@@@@@@@%:.:@@@@@+==-======---::................:*@%##*++=-::*@@@@@@#%@@@@@@@*::.............:%------------+%@@",
-                "@@@@@@@@@@@@@@@@#***+=======--:::....::+@@@@@@@@@@@@@@@=.......:------=====--::.........................:=++*@@@@@@%#@@#+-...................-----------------",
-                "@@@@@@@@@@@@@@@@%**++========---:::.......:::----:::..........:-------======--:.......................:......::::::::........................:----------------",
-                "@@+-#@@@@@@@@@@#**++====--------::::.......................::::::-----=====--:..........................:::::.::.............................----------------",
-                "*----*@@@@@@@@@#**++===-------::::::......................::::::::---======--::..............................................................----------------",
-                "-----=%@@@@@@@@#**+++===-----::::::.........................::::::---==++===-::..............................................................:---------------",
-                "------=#@@@@@@%***++====-----::::::...........................::::--==++++==-:::..............................................................---------------",
-                "===----=+@@@@@%#**+++====----::::::::.........................::::--=+++++==--::..............................................................:--------------",
-                "==========#@@@%#**+++=====----::::::::........................:::--=++*+++==--:::.............................................................:--------------",
-                "===========*@@##**++++====-----::::::::.......................:::-=+**+++===--:::..............................................................:-------------",
-                "============+*##**++++=====-----:::::::::.....................::--=+*++++===--:::..............................................................:-------------",
-                "============+*##**++++=====------::::::::::..................:::-=+*+++++====--::..............................................................::------------",
-                "============*###**++++=====-------::::::::::.................:::-****++++++===--:::...........................................................:::------------",
-                "============*###**++++=====--------:::::::::::...............::-###****+++++++==--:::::::::......::..........................................:::::-----------",
-                "===========+###***++++=====----------:::::::::...............:-######*********++====------:::::..:::.........................................:::::-----------",
-                "===========*###**+++++======----------::::::::::.............:*################**++++++**+=--::...::::....................................:::::::::----------",
-                "==========+*###**+++++======------------:::::::::...........:-#########%@@@@%####**++%%%%%#+--::....:...................................:..::::::::----------",
-                "==========+####**++++++======------------::::::::...........:-*######**%%@@@%%##**+=---==++=-::............................................::::::::----------",
-                "==========*%%##*****++++++==========--------:::::::::::::::::-=+*****+==+*###****+=-:::::::::::....:::::::::::::.:......:::::::::::::::::::::::::::-=========",
-                "+++++++++*#%%%#####*****++++++++++==========-----------------===+++++++=======+++++=--::::::::::::::::--------:::::::::::::-----:-------------------=++++++++"
-        };
+        // Load the ASCII art logo from the resource file.
+        String[] logo = loadLogo();
 
         // Determine where to position the title.
         int titleY = rows / 2 + 15;
@@ -138,12 +132,27 @@ public class RedLightGreenLight {
             tg.putString(lineX, lineY, line);
         }
 
-        String title = "WELCOME TO RED LIGHT GREEN LIGHT";
-        String instructions = "Press ENTER to PLAY or ESC to EXIT";
+        String titlePart1 = "WELCOME TO RED LIGHT ";
+        String titlePart2 = " LIGHT";
+        // Calculate total length for center offset
+        String combinedForLength = titlePart1 + "BLOOD" + titlePart2;
+        int totalLength = combinedForLength.length();
 
-        // Center the title on the screen.
-        int titleX = columns / 2 - title.length() / 2;
-        tg.putString(titleX, titleY, title);
+        int titleX = columns / 2 - totalLength / 2;
+
+        // Print "WELCOME TO RED LIGHT "
+        tg.setForegroundColor(TextColor.ANSI.DEFAULT);
+        tg.putString(titleX, titleY, titlePart1);
+
+        // Print "BLOOD" in red, immediately after
+        tg.setForegroundColor(TextColor.ANSI.RED);
+        tg.putString(titleX + titlePart1.length(), titleY, "BLOOD");
+
+        // Then the last part
+        tg.setForegroundColor(TextColor.ANSI.DEFAULT);
+        tg.putString(titleX + titlePart1.length() + "BLOOD".length(), titleY, titlePart2);
+
+        String instructions = "Press ENTER to PLAY or ESC to EXIT";
 
         // Center the instructions below the title.
         int instructionsX = columns / 2 - instructions.length() / 2;
@@ -165,7 +174,7 @@ public class RedLightGreenLight {
         }
     }
 
-    /**
+    /*
      * The main game loop logic.
      */
     private static void runGameLoop() throws IOException, InterruptedException {
@@ -208,7 +217,7 @@ public class RedLightGreenLight {
                 }
             } else {
                 for (Player p : players) {
-                    if (!p.isUser && !p.isEliminated && random.nextDouble() < 0.01) {
+                    if (!p.isUser && !p.isEliminated && random.nextDouble() < 0.005) {
                         Direction dir = Direction.values()[random.nextInt(4)];
                         attemptMove(p, dir);
                     }
@@ -226,18 +235,12 @@ public class RedLightGreenLight {
                         .withForegroundColor(isGreen ? TextColor.ANSI.GREEN : TextColor.ANSI.RED)
                         .withBackgroundColor(TextColor.ANSI.BLACK);
 
-                tg.setCharacter(x, 0, starChar);
+                tg.setCharacter(xOffset + x, yOffset + 0, starChar);
             }
 
             // Draw players
             for (Player p : players) {
-                if (!p.isEliminated) {
-                    char c = p.isUser ? 'P' : 'N';
-                    TextCharacter character = new TextCharacter(c)
-                            .withForegroundColor(TextColor.ANSI.WHITE)
-                            .withBackgroundColor(TextColor.ANSI.BLACK);
-                    tg.setCharacter(p.x, p.y, character);
-                }
+                drawPlayerSprite(tg, p);
             }
 
             screen.refresh();
@@ -264,7 +267,7 @@ public class RedLightGreenLight {
             if (lightTimer >= nextSwitch) {
                 isGreen = !isGreen;
                 lightTimer = 0;
-                nextSwitch = 2000 + random.nextInt(3000); // 2 to 5 seconds
+                nextSwitch = 1500 + random.nextInt(2000); // 1.5 to 3.5 seconds
             }
 
             Thread.sleep(50); // ~20 fps
@@ -273,9 +276,10 @@ public class RedLightGreenLight {
         // Display game over message
         screen.clear();
         TextGraphics tg = screen.newTextGraphics();
-        String message = user.isEliminated ? "You lose!" : "You win!";
-        int centerX = WIDTH / 2 - (message.length() / 2);
-        tg.putString(centerX, HEIGHT / 2, message);
+        String message = user.isEliminated ? "You die!" : "You win!";
+        int centerX = xOffset + (WIDTH / 2) - (message.length() / 2);
+        int centerY = yOffset + (HEIGHT / 2);
+        tg.putString(centerX, centerY, message);
 
         screen.refresh();
         Thread.sleep(2000);
@@ -284,16 +288,17 @@ public class RedLightGreenLight {
         screen.stopScreen();
     }
 
+    /*
+     * Initializes our player list and positions them at the bottom.
+     */
     private static void initializePlayers() {
         players = new ArrayList<>();
-        List<Integer> columns = new ArrayList<>();
-        for (int i = 0; i < WIDTH; i++) {
-            columns.add(i);
-        }
-        Collections.shuffle(columns);
 
-        for (int i = 0; i < 15; i++) {
-            Player p = new Player(columns.get(i), HEIGHT - 1);
+        for (int i = 0; i < 45; i++) {
+            // Place new player in a random column at the bottom row
+            int startX = random.nextInt(WIDTH);
+            Player p = new Player(startX, HEIGHT - 1);
+
             if (i == 0) { // First player is the user
                 p.isUser = true;
                 user = p;
@@ -302,6 +307,10 @@ public class RedLightGreenLight {
         }
     }
 
+    /*
+     * Attempts to move a given player in the specified direction,
+     * also pushing other players if the space is occupied.
+     */
     private static void attemptMove(Player p, Direction dir) {
         int dx = 0, dy = 0;
         switch (dir) {
@@ -334,8 +343,8 @@ public class RedLightGreenLight {
             p.y = newY;
         } else {
             // Attempt to push occupant
-            int pushX = newX + dx;
-            int pushY = newY + dy;
+            int pushX = occupant.x + dx;
+            int pushY = occupant.y + dy;
             if (pushX >= 0 && pushX < WIDTH && pushY >= 0 && pushY < HEIGHT && getPlayerAt(pushX, pushY) == null) {
                 occupant.x = pushX;
                 occupant.y = pushY;
@@ -345,6 +354,9 @@ public class RedLightGreenLight {
         }
     }
 
+    /*
+     * Returns the player occupying the position (x,y), or null if nobody is there.
+     */
     private static Player getPlayerAt(int x, int y) {
         for (Player p : players) {
             if (!p.isEliminated && p.x == x && p.y == y) {
@@ -352,5 +364,40 @@ public class RedLightGreenLight {
             }
         }
         return null;
+    }
+
+    /*
+     * Draws the player's ASCII sprite if they are not eliminated.
+     */
+    private static void drawPlayerSprite(TextGraphics tg, Player p) {
+        if (p.isEliminated) {
+            return;
+        }
+        // We'll offset in the drawing
+        int baseX = xOffset + (p.x - 1);
+        int baseY = yOffset + p.y;
+
+        if (p.isUser) {
+            putSafeString(tg, baseX, baseY - 3, "YOU");
+            putSafeString(tg, baseX, baseY - 2, " O ");
+            putSafeString(tg, baseX, baseY - 1, "/|\\");
+            putSafeString(tg, baseX, baseY,     "/ \\");
+        } else {
+            putSafeString(tg, baseX, baseY - 2, " O ");
+            putSafeString(tg, baseX, baseY - 1, "/|\\");
+            putSafeString(tg, baseX, baseY,     "/ \\");
+        }
+    }
+
+    private static void putSafeString(TextGraphics tg, int x, int y, String s) {
+        // If it's outside the screen bounds, skip
+        TerminalSize termSize = screen.getTerminalSize();
+        if (y < 0 || y >= termSize.getRows()) {
+            return;
+        }
+        if (x < 0 || x + s.length() >= termSize.getColumns()) {
+            return;
+        }
+        tg.putString(x, y, s);
     }
 }
