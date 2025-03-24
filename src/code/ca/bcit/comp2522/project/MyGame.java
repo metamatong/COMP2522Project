@@ -9,11 +9,14 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,6 +35,9 @@ public class MyGame extends Application {
     private static final int CANVAS_WIDTH = GRID_WIDTH * CELL_SIZE;
     private static final int CANVAS_HEIGHT = GRID_HEIGHT * CELL_SIZE;
 
+    // Duration to show a dying player (in nanoseconds)
+    private static final long DEATH_ANIMATION_DURATION = 300_000_000L; // 300ms
+
     // Game states
     private enum GameState { INTRO, GAME, GAME_OVER }
     private GameState gameState = GameState.INTRO;
@@ -42,6 +48,8 @@ public class MyGame extends Application {
         int prevX, prevY;
         boolean isUser;
         boolean isEliminated;
+        // Time (nanoTime) at which the player died.
+        long deathTimestamp = 0;
 
         Player(int x, int y) {
             this.x = x;
@@ -65,11 +73,17 @@ public class MyGame extends Application {
     // Timing variables (in nanoseconds)
     private long lastUpdateTime = 0;
     private long lastLightSwitchTime = 0;
-    // We will aim to update game logic roughly every 50ms
+    // We aim to update game logic roughly every 50ms
     private static final long UPDATE_INTERVAL = 50_000_000;
 
     // For intro screen logo (optional)
     private String[] logoLines;
+
+    // Sound effects
+    private AudioClip pushSound;
+    private AudioClip gunshotSound;
+    private AudioClip deathSound1;
+    private AudioClip deathSound2;
 
     @Override
     public void start(Stage primaryStage) {
@@ -91,7 +105,15 @@ public class MyGame extends Application {
             logoLines = new String[]{"RED LIGHT", "GREEN LIGHT"};
         }
 
-        // Set up key input for both intro and game states
+        // Load sound effect for pushing (already exists)
+        pushSound = new AudioClip(getClass().getResource("/push.wav").toExternalForm());
+
+        // Load gunshot and death sounds
+        gunshotSound = new AudioClip(getClass().getResource("/gunshot.mp3").toExternalForm());
+        deathSound1 = new AudioClip(getClass().getResource("/deathone.mp3").toExternalForm());
+        deathSound2 = new AudioClip(getClass().getResource("/deathtwo.mp3").toExternalForm());
+
+        // Set up key input for all game states
         scene.setOnKeyPressed(e -> {
             if (gameState == GameState.INTRO) {
                 if (e.getCode() == KeyCode.ENTER) {
@@ -101,7 +123,6 @@ public class MyGame extends Application {
                     Platform.exit();
                 }
             } else if (gameState == GameState.GAME) {
-                // Only allow movement if the game is not over
                 if (!gameOver) {
                     Direction dir = null;
                     if (e.getCode() == KeyCode.UP) {
@@ -114,12 +135,18 @@ public class MyGame extends Application {
                         dir = Direction.RIGHT;
                     }
                     if (dir != null) {
-                        attemptMove(user, dir);
+                        // For voluntary moves, call tryMoveWithPush with initiating true.
+                        tryMoveWithPush(user, directionDeltaX(dir), directionDeltaY(dir), new ArrayList<>(), true);
                     }
                 }
             } else if (gameState == GameState.GAME_OVER) {
-                // On game over screen, allow exit with any key
-                Platform.exit();
+                // In game over state, pressing ENTER will restart; ESC exits.
+                if (e.getCode() == KeyCode.ENTER) {
+                    initGame();
+                    gameState = GameState.GAME;
+                } else if (e.getCode() == KeyCode.ESCAPE) {
+                    Platform.exit();
+                }
             }
         });
 
@@ -128,8 +155,9 @@ public class MyGame extends Application {
         gc.setTextAlign(TextAlignment.LEFT);
         gc.setTextBaseline(VPos.TOP);
 
-        // Initialize timing for game logic updates and light switching
-        nextSwitch = 2000 + random.nextInt(2000); // 2 to 4 sec in ms
+        // Initialize timing for game logic updates and light switching.
+        // For green light, use a shorter window; for red light, use a longer window.
+        nextSwitch = 1500 + random.nextInt(2000); // green light duration
         lastLightSwitchTime = System.nanoTime();
 
         // Create and start the game loop
@@ -159,6 +187,28 @@ public class MyGame extends Application {
             }
         };
         gameLoop.start();
+    }
+
+    /**
+     * Helper to convert Direction to x delta.
+     */
+    private int directionDeltaX(Direction d) {
+        switch (d) {
+            case LEFT: return -1;
+            case RIGHT: return 1;
+            default: return 0;
+        }
+    }
+
+    /**
+     * Helper to convert Direction to y delta.
+     */
+    private int directionDeltaY(Direction d) {
+        switch (d) {
+            case UP: return -1;
+            case DOWN: return 1;
+            default: return 0;
+        }
     }
 
     /**
@@ -195,6 +245,7 @@ public class MyGame extends Application {
         }
         isGreen = true;
         gameOver = false;
+        // For green light, use a shorter window.
         nextSwitch = 1500 + random.nextInt(2000);
         lastLightSwitchTime = System.nanoTime();
     }
@@ -203,27 +254,43 @@ public class MyGame extends Application {
      * Updates the game logic.
      */
     private void updateGame(long now) {
-        // Process NPC movements based on the light color
+        // Process NPC movements if light is green.
         if (isGreen) {
             for (Player p : players) {
                 if (!p.isUser && !p.isEliminated && random.nextDouble() < 0.1) {
-                    attemptMove(p, Direction.UP);
+                    // NPC voluntary move: call tryMoveWithPush with initiating true.
+                    tryMoveWithPush(p, 0, -1, new ArrayList<>(), true);
                 }
             }
         } else {
+            // Even during red light, NPCs might move rarely.
             for (Player p : players) {
-                if (!p.isUser && !p.isEliminated && random.nextDouble() < 0.005) {
-                    Direction dir = Direction.values()[random.nextInt(4)];
-                    attemptMove(p, dir);
+                if (!p.isUser && !p.isEliminated && random.nextDouble() < 0.001) {
+                    Direction d = Direction.values()[random.nextInt(4)];
+                    tryMoveWithPush(p, directionDeltaX(d), directionDeltaY(d), new ArrayList<>(), true);
                 }
             }
         }
 
-        // Check elimination during red light using stored previous positions
+        // Elimination check during red light.
+        // Only players that have voluntarily moved during red light should be eliminated.
         if (!isGreen) {
             for (Player p : players) {
                 if (!p.isEliminated && (p.x != p.prevX || p.y != p.prevY)) {
                     p.isEliminated = true;
+                    p.deathTimestamp = now; // record death time
+                    // Play both sounds concurrently.
+                    gunshotSound.play();
+                    PauseTransition delay = new PauseTransition(Duration.seconds(0.7));
+                    delay.setOnFinished(event -> {
+                        // Randomly choose one of the two death sounds.
+                        if (random.nextBoolean()) {
+                            deathSound1.play();
+                        } else {
+                            deathSound2.play();
+                        }
+                    });
+                    delay.play();
                     if (p.isUser) {
                         gameOver = true;
                     }
@@ -231,20 +298,25 @@ public class MyGame extends Application {
             }
         }
 
-        // Check win condition: if the user reaches the top row
+        // Win condition: if user reaches the top row.
         if (user.y == 0 && !user.isEliminated) {
             gameOver = true;
         }
 
-        // Update the light timer
+        // Update light timer.
         long elapsedMs = (now - lastLightSwitchTime) / 1_000_000;
         if (elapsedMs >= nextSwitch) {
             isGreen = !isGreen;
             lastLightSwitchTime = now;
-            nextSwitch = 1500 + random.nextInt(2000); // 1.5 to 3.5 seconds
+            // Increase red light duration for more time to push/hide.
+            if (isGreen) {
+                nextSwitch = 1500 + random.nextInt(2000);
+            } else {
+                nextSwitch = 3000 + random.nextInt(2000);
+            }
         }
 
-        // IMPORTANT: Update previous positions after processing all movements and checks.
+        // Update previous positions.
         for (Player p : players) {
             p.prevX = p.x;
             p.prevY = p.y;
@@ -256,23 +328,51 @@ public class MyGame extends Application {
     }
 
     /*
-     * Attempts to move a given player in the specified direction,
-     * pushing other players if the space is occupied.
+     * Attempts to move player p by (dx, dy).
+     * For voluntary (initiating) moves, if the destination cell is occupied,
+     * p does not change its own cell (thus staying hidden) but attempts to push the occupant.
+     * For forced moves (initiating == false), the player always moves.
+     * If a push is initiated by the user, a sound effect is played.
      */
-    private void attemptMove(Player p, Direction dir) {
-        int dx = 0, dy = 0;
-        switch (dir) {
-            case UP:    dy = -1; break;
-            case DOWN:  dy = 1;  break;
-            case LEFT:  dx = -1; break;
-            case RIGHT: dx = 1;  break;
+    private boolean tryMoveWithPush(Player p, int dx, int dy, List<Player> visited, boolean initiating) {
+        if (visited.contains(p)) return false; // Prevent cycles
+        visited.add(p);
+        int newX = p.x + dx;
+        int newY = p.y + dy;
+        // Check grid bounds.
+        if (newX < 0 || newX >= GRID_WIDTH || newY < 0 || newY >= GRID_HEIGHT) {
+            return false;
         }
-        List<Player> visited = new ArrayList<>();
-        tryMoveWithPush(p, dx, dy, visited);
+        Player occupant = getPlayerAt(newX, newY);
+        if (occupant != null) {
+            // If the mover is the user and this is a voluntary push, play the sound.
+            if (initiating && p.isUser) {
+                pushSound.play();
+            }
+            // Save current position.
+            int oldX = p.x;
+            int oldY = p.y;
+            boolean pushed = tryMoveWithPush(occupant, dx, dy, visited, false);
+            if (!pushed) return false;
+            // If p is initiating the push, keep p in its original cell.
+            if (initiating) {
+                p.x = oldX;
+                p.y = oldY;
+            } else {
+                p.x = newX;
+                p.y = newY;
+            }
+            return true;
+        } else {
+            // Destination is free; update position.
+            p.x = newX;
+            p.y = newY;
+            return true;
+        }
     }
 
     /**
-     * Returns the player at the given grid coordinate, or null if none.
+     * Returns the player occupying the given grid cell (by center coordinate), or null if none.
      */
     private Player getPlayerAt(int x, int y) {
         for (Player p : players) {
@@ -285,13 +385,14 @@ public class MyGame extends Application {
 
     /**
      * Draws the game state.
+     * Dead players are drawn if their death animation period has not expired.
      */
     private void drawGame(GraphicsContext gc) {
-        // Clear canvas with black background
+        // Clear canvas.
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-        // Draw light machine (top row)
+        // Draw the light machine (top row).
         gc.setFont(Font.font("Monospaced", CELL_SIZE));
         gc.setTextAlign(TextAlignment.LEFT);
         for (int x = 0; x < GRID_WIDTH; x++) {
@@ -299,47 +400,49 @@ public class MyGame extends Application {
             gc.fillText("*", x * CELL_SIZE, 0);
         }
 
-        // Draw all players
+        long now = System.nanoTime();
+        // Draw players. If a player is eliminated, only draw if the death animation time hasn't elapsed.
         for (Player p : players) {
-            drawPlayerSprite(gc, p);
+            if (p.isEliminated) {
+                if (now - p.deathTimestamp < DEATH_ANIMATION_DURATION) {
+                    drawPlayerSprite(gc, p);
+                }
+            } else {
+                drawPlayerSprite(gc, p);
+            }
         }
     }
 
     /**
      * Draws a player's ASCII sprite.
+     * The user-controlled player is drawn in a different color.
      */
     private void drawPlayerSprite(GraphicsContext gc, Player p) {
-        if (p.isEliminated) {
-            return;
-        }
-        // Calculate base drawing position (we shift left one cell to allow for multi-character sprite)
         double baseX = (p.x - 1) * CELL_SIZE;
         double baseY = p.y * CELL_SIZE;
-        gc.setFill(Color.WHITE);
         if (p.isUser) {
-            // Draw user sprite (with "YOU" above)
+            gc.setFill(Color.CYAN);
             putSafeString(gc, baseX, baseY - 3 * CELL_SIZE, "YOU");
             putSafeString(gc, baseX, baseY - 2 * CELL_SIZE, " O ");
             putSafeString(gc, baseX, baseY - 1 * CELL_SIZE, "/|\\");
-            putSafeString(gc, baseX, baseY,           "/ \\");
+            putSafeString(gc, baseX, baseY, "/ \\");
         } else {
-            // Draw NPC sprite
+            gc.setFill(Color.WHITE);
             putSafeString(gc, baseX, baseY - 2 * CELL_SIZE, " O ");
             putSafeString(gc, baseX, baseY - 1 * CELL_SIZE, "/|\\");
-            putSafeString(gc, baseX, baseY,           "/ \\");
+            putSafeString(gc, baseX, baseY, "/ \\");
         }
     }
 
-    // Helper method to compute text width
+    // Helper method to compute text width for centering.
     private double computeTextWidth(String text, Font font) {
         Text tempText = new Text(text);
         tempText.setFont(font);
         return tempText.getLayoutBounds().getWidth();
     }
 
-
     /**
-     * Draws a string only if its position is within the canvas bounds.
+     * Draws a string only if its position is within canvas bounds.
      */
     private void putSafeString(GraphicsContext gc, double x, double y, String s) {
         if (x + s.length() * CELL_SIZE / 2 < 0 || x > CANVAS_WIDTH) return;
@@ -351,13 +454,11 @@ public class MyGame extends Application {
      * Draws the intro screen with logo, title, and instructions.
      */
     private void drawIntroScreen(GraphicsContext gc) {
-        // Clear background
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         gc.setFill(Color.WHITE);
         gc.setFont(Font.font("Monospaced", CELL_SIZE));
 
-        // Draw logo (if available) centered vertically around the middle
         int logoHeight = logoLines.length;
         double logoY = CANVAS_HEIGHT / 2 - (logoHeight * CELL_SIZE) / 2 - CELL_SIZE;
         for (int i = 0; i < logoLines.length; i++) {
@@ -366,7 +467,6 @@ public class MyGame extends Application {
             double x = (CANVAS_WIDTH - textWidth) / 2;
             gc.fillText(line, x, logoY + i * CELL_SIZE);
         }
-        // Draw title with a red word in the middle
         String titlePart1 = "WELCOME TO RED LIGHT ";
         String titlePart2 = " LIGHT";
         String redWord = "BLOOD";
@@ -383,7 +483,6 @@ public class MyGame extends Application {
         gc.setFill(Color.WHITE);
         gc.fillText(titlePart2, titleX + offset, titleY);
 
-        // Draw instructions
         String instructions = "Press ENTER to PLAY or ESC to EXIT";
         double instrWidth = computeTextWidth(instructions, gc.getFont());
         double instrX = (CANVAS_WIDTH - instrWidth) / 2;
@@ -392,81 +491,20 @@ public class MyGame extends Application {
     }
 
     /**
-     * Draws the game over screen with a win/lose message.
+     * Draws the game over screen with a win/lose message and a prompt.
      */
     private void drawGameOverScreen(GraphicsContext gc) {
-        // Clear background
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         gc.setFill(Color.WHITE);
         gc.setFont(Font.font("Monospaced", CELL_SIZE));
 
         String message = user.isEliminated ? "You die!" : "You win!";
+        message += " Press ENTER to try again.";
         double textWidth = computeTextWidth(message, gc.getFont());
         double centerX = (CANVAS_WIDTH - textWidth) / 2;
         double centerY = CANVAS_HEIGHT / 2;
         gc.fillText(message, centerX, centerY);
-    }
-
-    // Define a simple rectangle for collision detection.
-    private static class Rect {
-        int x, y, width, height;
-        Rect(int x, int y, int width, int height) {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-        }
-    }
-
-    // Given a center coordinate and whether the player is the user,
-// return the collision bounds based on the drawn sprite.
-    private Rect getBoundsForPosition(int centerX, int centerY, boolean isUser) {
-        int left = centerX - 1;
-        // For the user, the sprite is drawn from (centerY - 3) to centerY (4 rows),
-        // for NPCs from (centerY - 2) to centerY (3 rows).
-        int top = isUser ? centerY - 3 : centerY - 2;
-        int width = 3;
-        int height = isUser ? 4 : 3;
-        return new Rect(left, top, width, height);
-    }
-
-    // Check if two rectangles intersect.
-    private boolean rectsIntersect(Rect r1, Rect r2) {
-        return r1.x < r2.x + r2.width && r1.x + r1.width > r2.x &&
-                r1.y < r2.y + r2.height && r1.y + r1.height > r2.y;
-    }
-
-    private boolean tryMoveWithPush(Player p, int dx, int dy, List<Player> visited) {
-        if (visited.contains(p)) return false; // Prevent cycles
-        visited.add(p);
-
-        int newX = p.x + dx;
-        int newY = p.y + dy;
-
-        // Check if the new center is within bounds.
-        if(newX < 0 || newX >= GRID_WIDTH || newY < 0 || newY >= GRID_HEIGHT) {
-            return false;
-        }
-
-        Rect newBounds = getBoundsForPosition(newX, newY, p.isUser);
-
-        // Check for collisions with other players.
-        for (Player q : players) {
-            if (q == p || q.isEliminated) continue;
-            Rect qBounds = getBoundsForPosition(q.x, q.y, q.isUser);
-            if (rectsIntersect(newBounds, qBounds)) {
-                // Try to push the colliding player in the same direction.
-                boolean pushed = tryMoveWithPush(q, dx, dy, visited);
-                if (!pushed) {
-                    return false;
-                }
-            }
-        }
-        // No collision (or successful pushes), so update p's position.
-        p.x = newX;
-        p.y = newY;
-        return true;
     }
 
     public static void main(String[] args) {
