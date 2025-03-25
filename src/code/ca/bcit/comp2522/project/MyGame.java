@@ -29,16 +29,15 @@ import java.util.Random;
 public class MyGame extends Application {
 
     // Game grid constants
-    private static final int GRID_WIDTH = 60;
+    private static final int GRID_WIDTH = 50;
     private static final int GRID_HEIGHT = 40;
     private static final int CELL_SIZE = 20; // pixel size per grid cell
+    private static final int TOP_MARGIN = 10;
+    private static final int BOTTOM_MARGIN = 20;
     private static final int CANVAS_WIDTH = GRID_WIDTH * CELL_SIZE;
-    private static final int CANVAS_HEIGHT = GRID_HEIGHT * CELL_SIZE;
+    private static final int CANVAS_HEIGHT = GRID_HEIGHT * CELL_SIZE + TOP_MARGIN + BOTTOM_MARGIN;
     private static final int FINISH_LINE_Y = 5; // Change from 0 to 5 (or another value) so players finish sooner.
     private static final int STAT_HEIGHT = CELL_SIZE; // Height for the stats display (you can adjust as needed)
-
-    // Duration to show a dying player (in nanoseconds)
-    private static final long DEATH_ANIMATION_DURATION = 300_000_000L; // 300ms
 
     // Game states
     private enum GameState { INTRO, GAME, GAME_OVER }
@@ -431,7 +430,7 @@ public class MyGame extends Application {
 
         // Clear previous stats
         gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, CANVAS_WIDTH, STAT_HEIGHT);
+        gc.fillRect(0, TOP_MARGIN, CANVAS_WIDTH, STAT_HEIGHT);
 
         // Prepare the stats string.
         String stats = String.format("Time: %.1fs   Finished: %d   Dead: %d",
@@ -440,17 +439,17 @@ public class MyGame extends Application {
         // Draw the stats at the top left (using a smaller font so it fits nicely).
         gc.setFill(Color.YELLOW);
         gc.setFont(Font.font("Monospaced", CELL_SIZE / 2));
-        gc.fillText(stats, 5, CELL_SIZE / 2);
+        gc.fillText(stats, 5, TOP_MARGIN + CELL_SIZE / 2);
 
         gc.setFill(Color.BLACK);
         // Clear only below the header area.
-        gc.fillRect(0, STAT_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT - STAT_HEIGHT);
+        gc.fillRect(0, TOP_MARGIN + STAT_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT - TOP_MARGIN - STAT_HEIGHT);
 
         gc.setFont(Font.font("Monospaced", CELL_SIZE));
         gc.setTextAlign(TextAlignment.LEFT);
         for (int x = 0; x < GRID_WIDTH; x++) {
             gc.setFill(isGreen ? Color.GREEN : Color.RED);
-            gc.fillText("*", x * CELL_SIZE, STAT_HEIGHT);
+            gc.fillText("*", x * CELL_SIZE, TOP_MARGIN + STAT_HEIGHT);
         }
 
         long now = System.nanoTime();
@@ -468,17 +467,19 @@ public class MyGame extends Application {
     // Draws a player's ASCII sprite.
     private void drawPlayerSprite(GraphicsContext gc, Player p) {
         double baseX = (p.x - 1) * CELL_SIZE;
-        double baseY = p.y * CELL_SIZE + STAT_HEIGHT;  // add the offset here
+        double baseY = p.y * CELL_SIZE + TOP_MARGIN + STAT_HEIGHT;
         if (p.isUser) {
             gc.setFill(Color.CYAN);
-            putSafeString(gc, baseX, baseY - 3 * CELL_SIZE, "YOU");
-            putSafeString(gc, baseX, baseY - 2 * CELL_SIZE, " O ");
-            putSafeString(gc, baseX, baseY - 1 * CELL_SIZE, "/|\\");
+            putSafeString(gc, baseX, baseY - 4 * CELL_SIZE, "YOU");
+            putSafeString(gc, baseX, baseY - 3 * CELL_SIZE, " O ");
+            putSafeString(gc, baseX, baseY - 2 * CELL_SIZE, "/|\\");
+            putSafeString(gc, baseX, baseY - 1 * CELL_SIZE, " | ");
             putSafeString(gc, baseX, baseY, "/ \\");
         } else {
             gc.setFill(Color.WHITE);
-            putSafeString(gc, baseX, baseY - 2 * CELL_SIZE, " O ");
-            putSafeString(gc, baseX, baseY - 1 * CELL_SIZE, "/|\\");
+            putSafeString(gc, baseX, baseY - 3 * CELL_SIZE, " O ");
+            putSafeString(gc, baseX, baseY - 2 * CELL_SIZE, "/|\\");
+            putSafeString(gc, baseX, baseY - 1 * CELL_SIZE, " | ");
             putSafeString(gc, baseX, baseY, "/ \\");
         }
     }
@@ -502,21 +503,23 @@ public class MyGame extends Application {
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         gc.setFill(Color.WHITE);
-        gc.setFont(Font.font("Monospaced", CELL_SIZE));
+        gc.setFont(Font.font("Monospaced", CELL_SIZE * 0.75));
 
         int logoHeight = logoLines.length;
-        double logoY = CANVAS_HEIGHT / 2 - (logoHeight * CELL_SIZE) / 2 - CELL_SIZE;
+        double logoY = CANVAS_HEIGHT / 2 - (logoHeight * CELL_SIZE * 0.75) / 2 - (CELL_SIZE * 0.75);
         for (int i = 0; i < logoLines.length; i++) {
             String line = logoLines[i];
             double textWidth = computeTextWidth(line, gc.getFont());
             double x = (CANVAS_WIDTH - textWidth) / 2;
-            gc.fillText(line, x, logoY + i * CELL_SIZE);
+            gc.fillText(line, x, logoY + i * CELL_SIZE * 0.75);
         }
+
+        gc.setFont(Font.font("Monospaced", CELL_SIZE)); // Back to original size for title
         String titlePart1 = "WELCOME TO RED LIGHT ";
         String titlePart2 = " LIGHT";
         String redWord = "BLOOD";
         String fullTitle = titlePart1 + redWord + titlePart2;
-        double titleY = logoY + logoHeight * CELL_SIZE + CELL_SIZE;
+        double titleY = logoY + logoHeight * CELL_SIZE * 0.75 + CELL_SIZE;
         double titleWidth = computeTextWidth(fullTitle, gc.getFont());
         double titleX = (CANVAS_WIDTH - titleWidth) / 2;
         gc.setFill(Color.WHITE);
@@ -568,9 +571,9 @@ public class MyGame extends Application {
 
     private void drawDeadSprite(GraphicsContext gc, Player p) {
         double baseX = (p.x - 1) * CELL_SIZE;
-        double baseY = p.y * CELL_SIZE + STAT_HEIGHT;
+        double baseY = p.y * CELL_SIZE + TOP_MARGIN + STAT_HEIGHT;
         gc.setFill(Color.GRAY); // Use gray to indicate death.
-        // Draw a dead body: head becomes " X " instead of " O "
+        // Draw a dead body.
         putSafeString(gc, baseX, baseY - 2 * CELL_SIZE, "  ____");
         putSafeString(gc, baseX, baseY - 1 * CELL_SIZE, "--O---");
     }
