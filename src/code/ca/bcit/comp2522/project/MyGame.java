@@ -189,14 +189,30 @@ public class MyGame extends Application {
                     lastUpdateTime = now;
                 }
 
-                // Update background music state based on gameState.
-                if (gameState == GameState.INTRO && !bgmPlaying) {
-                    bgm.setCycleCount(AudioClip.INDEFINITE); // loop forever
-                    bgm.play();
-                    bgmPlaying = true;
-                } else if (gameState != GameState.INTRO && bgmPlaying) {
-                    bgm.stop();
-                    bgmPlaying = false;
+                if (gameState == GameState.INTRO) {
+                    if (!bgmPlaying) {
+                        bgm.setCycleCount(AudioClip.INDEFINITE);
+                        bgm.play();
+                        bgmPlaying = true;
+                    }
+                } else if (gameState == GameState.GAME) {
+                    if (isGreen) {
+                        if (!bgmPlaying) {
+                            bgm.setCycleCount(AudioClip.INDEFINITE);
+                            bgm.play();
+                            bgmPlaying = true;
+                        }
+                    } else {
+                        if (bgmPlaying) {
+                            bgm.stop();
+                            bgmPlaying = false;
+                        }
+                    }
+                } else { // GAME_OVER or other states
+                    if (bgmPlaying) {
+                        bgm.stop();
+                        bgmPlaying = false;
+                    }
                 }
             }
         };
@@ -447,9 +463,11 @@ public class MyGame extends Application {
 
         gc.setFont(Font.font("Monospaced", CELL_SIZE));
         gc.setTextAlign(TextAlignment.LEFT);
-        for (int x = 0; x < GRID_WIDTH; x++) {
-            gc.setFill(isGreen ? Color.GREEN : Color.RED);
-            gc.fillText("*", x * CELL_SIZE, TOP_MARGIN + STAT_HEIGHT);
+        if (!isGreen) {
+            // When the light is red, draw the doll machine.
+            drawLightMachine(gc);
+        } else {
+            drawGreenMachine(gc);
         }
 
         long now = System.nanoTime();
@@ -576,6 +594,57 @@ public class MyGame extends Application {
         // Draw a dead body.
         putSafeString(gc, baseX, baseY - 2 * CELL_SIZE, "  ____");
         putSafeString(gc, baseX, baseY - 1 * CELL_SIZE, "--O---");
+    }
+
+    private void drawLightMachine(GraphicsContext gc) {
+        // Define the doll ASCII art as an array of strings.
+        String[] doll = {
+                "   .^-^.     ",
+                "   (o o)     ",
+                "   / V \\     ",
+                "  /|---|\\    ",
+                "   |===|     ",
+                "   \\ | /     ",
+                "    \\|/     "
+        };
+
+        // Set the fill color to red.
+        gc.setFill(Color.RED);
+
+        // Compute starting position to center the doll.
+        // Adjust the width calculation factor as needed (here CELL_SIZE*0.6 is an approximate width per character).
+        double dollWidth = doll[0].length() * (CELL_SIZE * 0.6);
+        double startX = (CANVAS_WIDTH - dollWidth) / 2;
+        double startY = TOP_MARGIN + STAT_HEIGHT; // Position below the header.
+
+        // Draw each line of the doll.
+        for (int i = 0; i < doll.length; i++) {
+            putSafeString(gc, startX, startY + i * CELL_SIZE, doll[i]);
+        }
+    }
+
+    private void drawGreenMachine(GraphicsContext gc) {
+        String[] doll = {
+                "   .^-^.     ",
+                "   (   )     ",
+                "   / - \\     ",
+                "  /|---|\\    ",
+                "   |===|     ",
+                "   \\ | /     ",
+                "    \\|/     "
+        };
+
+        gc.setFill(Color.GREEN);
+
+        // Compute starting position to center the doll.
+        double dollWidth = doll[0].length() * (CELL_SIZE * 0.6);
+        double startX = (CANVAS_WIDTH - dollWidth) / 2;
+        double startY = TOP_MARGIN + STAT_HEIGHT; // same position as red light
+
+        // Draw each line of the doll.
+        for (int i = 0; i < doll.length; i++) {
+            putSafeString(gc, startX, startY + i * CELL_SIZE, doll[i]);
+        }
     }
 
     public static void main(String[] args) {
