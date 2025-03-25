@@ -470,6 +470,16 @@ public class MyGame extends Application {
             drawGreenMachine(gc);
         }
 
+        double finishLineYCanvas = FINISH_LINE_Y * CELL_SIZE + TOP_MARGIN + STAT_HEIGHT;
+
+        // Set the stroke properties.
+        gc.setStroke(Color.DARKGREEN); // Choose a visible color.
+        gc.setLineWidth(1);         // Adjust thickness as needed.
+
+        // Draw a horizontal line across the canvas.
+        gc.strokeLine(0, finishLineYCanvas, CANVAS_WIDTH, finishLineYCanvas);
+
+
         long now = System.nanoTime();
         for (Player p : players) {
             // Skip finished players so they no longer appear on-screen.
