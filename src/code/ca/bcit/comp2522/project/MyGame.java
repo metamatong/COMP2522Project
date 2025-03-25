@@ -38,6 +38,7 @@ public class MyGame extends Application {
     private static final int CANVAS_HEIGHT = GRID_HEIGHT * CELL_SIZE + TOP_MARGIN + BOTTOM_MARGIN;
     private static final int FINISH_LINE_Y = 5; // Change from 0 to 5 (or another value) so players finish sooner.
     private static final int STAT_HEIGHT = CELL_SIZE; // Height for the stats display (you can adjust as needed)
+    private static final long MOVE_COOLDOWN = 400_000_000;
 
     // Game states
     private enum GameState { INTRO, GAME, GAME_OVER }
@@ -51,8 +52,11 @@ public class MyGame extends Application {
         boolean isUser;
         boolean isEliminated;
         boolean finished;  // new: has the player finished?
+        boolean isPushing = false;  // New: indicates that this player is currently pushing
+        boolean isPushed = false;   // New: indicates that this player is currently being pushed down
         // Time (nanoTime) at which the player died.
         long deathTimestamp = 0;
+        long lastMoveTime = 0; // New: last time this player moved
 
         Player(int x, int y) {
             this.x = x;
@@ -85,8 +89,8 @@ public class MyGame extends Application {
     // We aim to update game logic roughly every 50ms
     private static final long UPDATE_INTERVAL = 50_000_000;
 
-    // For intro screen logo (optional)
     private String[] logoLines;
+    private String[] logoWinLines;
 
     // Sound effects
     private AudioClip pushSound;
@@ -111,7 +115,7 @@ public class MyGame extends Application {
         try {
             logoLines = loadLogo();
         } catch (IOException e) {
-            logoLines = new String[]{"RED LIGHT", "GREEN LIGHT"};
+            logoLines = new String[]{"RED LIGHT", "BLOOD LIGHT"};
         }
 
         // Load sound effects.
@@ -162,7 +166,7 @@ public class MyGame extends Application {
         gc.setTextBaseline(VPos.TOP);
 
         // Initialize timing for game logic updates and light switching.
-        nextSwitch = 1500 + random.nextInt(2000); // green light duration
+        nextSwitch = 1500 + random.nextInt(4000); // green light duration
         lastLightSwitchTime = System.nanoTime();
 
         AnimationTimer gameLoop = new AnimationTimer() {
@@ -183,7 +187,11 @@ public class MyGame extends Application {
                             drawGame(gc);
                             break;
                         case GAME_OVER:
-                            drawGameOverScreen(gc);
+                            try {
+                                drawGameOverScreen(gc);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                             break;
                     }
                     lastUpdateTime = now;
@@ -241,6 +249,19 @@ public class MyGame extends Application {
     private String[] loadLogo() throws IOException {
         List<String> lines = new ArrayList<>();
         try (InputStream is = getClass().getResourceAsStream("/logo.txt");
+             BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+            if (is == null) throw new IOException("Logo resource not found!");
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        }
+        return lines.toArray(new String[0]);
+    }
+
+    private String[] loadWinLogo() throws IOException {
+        List<String> lines = new ArrayList<>();
+        try (InputStream is = getClass().getResourceAsStream("/winLogo.txt");
              BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
             if (is == null) throw new IOException("Logo resource not found!");
             String line;
@@ -392,6 +413,12 @@ public class MyGame extends Application {
      * If a push is initiated by the user, a sound effect is played.
      */
     private boolean tryMoveWithPush(Player p, int dx, int dy, List<Player> visited, boolean initiating) {
+        long now = System.nanoTime();
+        // Only allow the move if the cooldown has elapsed
+        if (now - p.lastMoveTime < MOVE_COOLDOWN) {
+            return false;
+        }
+
         if (visited.contains(p)) return false;
         visited.add(p);
         int newX = p.x + dx;
@@ -401,6 +428,16 @@ public class MyGame extends Application {
         if (occupant != null) {
             if (initiating && p.isUser) {
                 pushSound.play();
+                // Set visual flags for pushing and pushed.
+                p.isPushing = true;
+                occupant.isPushed = true;
+                // Reset these flags after a short delay.
+                PauseTransition pt = new PauseTransition(Duration.millis(300));
+                pt.setOnFinished(e -> {
+                    p.isPushing = false;
+                    occupant.isPushed = false;
+                });
+                pt.play();
             }
             int oldX = p.x;
             int oldY = p.y;
@@ -413,10 +450,12 @@ public class MyGame extends Application {
                 p.x = newX;
                 p.y = newY;
             }
+            p.lastMoveTime = now;
             return true;
         } else {
             p.x = newX;
             p.y = newY;
+            p.lastMoveTime = now;
             return true;
         }
     }
@@ -454,7 +493,7 @@ public class MyGame extends Application {
 
         // Draw the stats at the top left (using a smaller font so it fits nicely).
         gc.setFill(Color.YELLOW);
-        gc.setFont(Font.font("Monospaced", CELL_SIZE / 2));
+        gc.setFont(Font.font("Monospaced", CELL_SIZE * 3 / 5));
         gc.fillText(stats, 5, TOP_MARGIN + CELL_SIZE / 2);
 
         gc.setFill(Color.BLACK);
@@ -498,17 +537,28 @@ public class MyGame extends Application {
         double baseY = p.y * CELL_SIZE + TOP_MARGIN + STAT_HEIGHT;
         if (p.isUser) {
             gc.setFill(Color.CYAN);
-            putSafeString(gc, baseX, baseY - 4 * CELL_SIZE, "YOU");
-            putSafeString(gc, baseX, baseY - 3 * CELL_SIZE, " O ");
-            putSafeString(gc, baseX, baseY - 2 * CELL_SIZE, "/|\\");
-            putSafeString(gc, baseX, baseY - 1 * CELL_SIZE, " | ");
-            putSafeString(gc, baseX, baseY, "/ \\");
+            if (p.isPushing) {
+                drawPushingSprite(gc, p, baseX, baseY);
+            } else if (p.isPushed) {
+                drawPushedSprite(gc, p, baseX, baseY);
+            } else {
+                putSafeString(gc, baseX, baseY - 4 * CELL_SIZE, "YOU");
+                putSafeString(gc, baseX, baseY - 3 * CELL_SIZE, " O ");
+                putSafeString(gc, baseX, baseY - 2 * CELL_SIZE, "/|\\");
+                putSafeString(gc, baseX, baseY - 1 * CELL_SIZE, " | ");
+                putSafeString(gc, baseX, baseY, "/ \\");
+            }
         } else {
             gc.setFill(Color.WHITE);
-            putSafeString(gc, baseX, baseY - 3 * CELL_SIZE, " O ");
-            putSafeString(gc, baseX, baseY - 2 * CELL_SIZE, "/|\\");
-            putSafeString(gc, baseX, baseY - 1 * CELL_SIZE, " | ");
-            putSafeString(gc, baseX, baseY, "/ \\");
+            // For NPCs, you might only want to show a pushed sprite if they're being pushed.
+            if (p.isPushed) {
+                drawPushedSprite(gc, p, baseX, baseY);
+            } else {
+                putSafeString(gc, baseX, baseY - 3 * CELL_SIZE, " O ");
+                putSafeString(gc, baseX, baseY - 2 * CELL_SIZE, "/|\\");
+                putSafeString(gc, baseX, baseY - 1 * CELL_SIZE, " | ");
+                putSafeString(gc, baseX, baseY, "/ \\");
+            }
         }
     }
 
@@ -567,18 +617,68 @@ public class MyGame extends Application {
     }
 
     // Draws the game over screen.
-    private void drawGameOverScreen(GraphicsContext gc) {
+    private void drawGameOverScreen(GraphicsContext gc) throws IOException {
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        gc.setFill(Color.WHITE);
-        gc.setFont(Font.font("Monospaced", CELL_SIZE));
 
-        String message = user.isEliminated ? "You die!" : "You win!";
-        message += " Press ENTER to try again.";
-        double textWidth = computeTextWidth(message, gc.getFont());
-        double centerX = (CANVAS_WIDTH - textWidth) / 2;
-        double centerY = CANVAS_HEIGHT / 2;
-        gc.fillText(message, centerX, centerY);
+        if (user.isEliminated) {
+            // Losing screen
+            gc.setFill(Color.WHITE);
+            gc.setFont(Font.font("Monospaced", CELL_SIZE));
+            String message = "You die! Press ENTER to try again.";
+            double textWidth = computeTextWidth(message, gc.getFont());
+            double centerX = (CANVAS_WIDTH - textWidth) / 2;
+            double centerY = CANVAS_HEIGHT / 2;
+            gc.fillText(message, centerX, centerY);
+        } else {
+            // Winning screen
+
+            // Attempt to load a separate "win" ASCII-art logo if available:
+            // (We already have a loadWinLogo() method; use it here.)
+            String[] winLogo;
+            try {
+                winLogo = loadWinLogo(); // load from /winLogo.txt
+            } catch (IOException e) {
+                // If file not found or any error, just use a fallback text:
+                winLogo = new String[]{
+                        "YOU WIN!",
+                        "(No fancy win logo found.)"
+                };
+            }
+
+            // Draw the winning logo (similar to how drawIntroScreen does it)
+            gc.setFill(Color.WHITE);
+            gc.setFont(Font.font("Monospaced", CELL_SIZE * 0.75));
+
+            int logoHeight = winLogo.length;
+            // Center vertically and leave a little room above/below
+            double logoY = CANVAS_HEIGHT / 2
+                    - (logoHeight * CELL_SIZE * 0.75) / 2
+                    - (CELL_SIZE * 0.75);
+
+            for (int i = 0; i < winLogo.length; i++) {
+                String line = winLogo[i];
+                double textWidth = computeTextWidth(line, gc.getFont());
+                double x = (CANVAS_WIDTH - textWidth) / 2;
+                gc.fillText(line, x, logoY + i * CELL_SIZE * 0.75);
+            }
+
+            // Now show the “You win!” message below the logo
+            gc.setFont(Font.font("Monospaced", CELL_SIZE));
+            String message = "You win! But have you truly earned it "
+                    + "after all these fallen fates?";
+            double messageWidth = computeTextWidth(message, gc.getFont());
+            double messageX = (CANVAS_WIDTH - messageWidth) / 2;
+            double messageY = logoY + logoHeight * CELL_SIZE * 0.75 + CELL_SIZE;
+            gc.fillText(message, messageX, messageY);
+
+            // Show replay/exit instructions
+            String instructions = "Press ENTER to Play Again or ESC to Exit";
+            double instrWidth = computeTextWidth(instructions, gc.getFont());
+            double instrX = (CANVAS_WIDTH - instrWidth) / 2;
+            double instrY = messageY + CELL_SIZE * 2;
+            gc.fillText(instructions, instrX, instrY);
+        }
     }
 
     private void scheduleDeathSequence(Player p, double delaySeconds) {
@@ -655,6 +755,28 @@ public class MyGame extends Application {
         for (int i = 0; i < doll.length; i++) {
             putSafeString(gc, startX, startY + i * CELL_SIZE, doll[i]);
         }
+    }
+
+    private void drawPushingSprite(GraphicsContext gc, Player p, double baseX, double baseY) {
+        // Example ASCII art for the pushing action.
+        // You can adjust these strings as needed.
+        gc.setFill(p.isUser ? Color.CYAN : Color.WHITE);
+        putSafeString(gc, baseX, baseY - 4 * CELL_SIZE, p.isUser ? "YOU" : "");
+        putSafeString(gc, baseX, baseY - 3 * CELL_SIZE, " O ");
+        // Note the extra dash on the left to suggest pushing.
+        putSafeString(gc, baseX, baseY - 2 * CELL_SIZE, "-|\\");
+        putSafeString(gc, baseX, baseY - 1 * CELL_SIZE, " | ");
+        putSafeString(gc, baseX, baseY, "/ \\");
+    }
+
+    private void drawPushedSprite(GraphicsContext gc, Player p, double baseX, double baseY) {
+        // Example ASCII art for a pushed/losing-balance sprite.
+        gc.setFill(p.isUser ? Color.CYAN : Color.WHITE);
+        putSafeString(gc, baseX, baseY - 3 * CELL_SIZE, " O ");
+        putSafeString(gc, baseX, baseY - 2 * CELL_SIZE, "/|\\");
+        // Slightly shifted leg or extra mark to indicate imbalance.
+        putSafeString(gc, baseX, baseY - 1 * CELL_SIZE, " |\\");
+        putSafeString(gc, baseX, baseY, "/ \\");
     }
 
     public static void main(String[] args) {
