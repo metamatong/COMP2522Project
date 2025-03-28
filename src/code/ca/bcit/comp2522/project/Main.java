@@ -10,6 +10,11 @@ import java.util.Scanner;
  */
 class Main
 {
+    private static final String WORD_GAME_INITIAL = "W";
+    private static final String NUMBER_GAME_INITIAL = "N";
+    private static final String MY_GAME_INITIAL = "M";
+    private static final String QUIT_INITIAL = "Q";
+
     public static void main(final String[] args)
     {
         final Scanner scanner;
@@ -18,33 +23,33 @@ class Main
         while(true)
         {
             System.out.println("\nMenu:");
-            System.out.println("Press W to play the Word game.");
-            System.out.println("Press N to play the Number game.");
-            System.out.println("Press M to play the Red Light Blood Light.");
-            System.out.println("Press Q to quit.");
+            System.out.println("Press " + WORD_GAME_INITIAL + " to play the Word game.");
+            System.out.println("Press " + NUMBER_GAME_INITIAL + " to play the Number game.");
+            System.out.println("Press " + MY_GAME_INITIAL + " to play the Red Light Blood Light.");
+            System.out.println("Press " + QUIT_INITIAL + " to quit.");
             System.out.print("Enter your choice: ");
 
             final String input;
             input = scanner.nextLine().trim();
 
-            if(input.equalsIgnoreCase("q"))
+            if(input.equalsIgnoreCase(QUIT_INITIAL))
             {
                 System.out.println("Goodbye!");
                 break;
             }
-            else if(input.equalsIgnoreCase("w"))
+            else if(input.equalsIgnoreCase(WORD_GAME_INITIAL))
             {
                 final WordGame wordGame;
                 wordGame = new WordGame();
                 wordGame.playWordGame();
             }
-            else if(input.equalsIgnoreCase("n"))
+            else if(input.equalsIgnoreCase(NUMBER_GAME_INITIAL))
             {
                 NumberGame.main(new String[]{});
             }
-            else if(input.equalsIgnoreCase("m"))
+            else if(input.equalsIgnoreCase(MY_GAME_INITIAL))
             {
-                System.out.println("<your game's name> game is not implemented yet.");
+                MyGame.main(new String[]{});
             }
             else
             {

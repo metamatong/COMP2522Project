@@ -163,7 +163,7 @@ public class Score
             e.printStackTrace();
         }
 
-        try (final FileWriter writer = new FileWriter(scoreFilePath, true))
+        try(final FileWriter writer = new FileWriter(scoreFilePath, true))
         {
             writer.write(System.lineSeparator());
             writer.write("Date and Time: " + formattedDateTime + "\n");
