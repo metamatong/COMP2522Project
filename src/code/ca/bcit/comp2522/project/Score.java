@@ -203,9 +203,17 @@ public class Score
     {
         final List<Score> scoresList;
         final DateTimeFormatter formatter;
+        final File file;
 
         scoresList = new ArrayList<>();
         formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        file = new File(scoreFilePath);
+
+        if(!file.exists())
+        {
+            System.out.println("Score file not found at " + scoreFilePath + ". Returning an empty list.");
+            return scoresList;
+        }
 
         try(final BufferedReader reader = new BufferedReader(new FileReader(scoreFilePath)))
         {

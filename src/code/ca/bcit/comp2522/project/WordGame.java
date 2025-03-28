@@ -340,10 +340,10 @@ public class WordGame
             }
         }
 
+        reportScores(currentScore, previousHighestScore, previousHighestScoreTime);
+
         // This must be done before calculating previousHighestScore
         Score.appendScoreToFile(currentScore, scoreFileUrl);
-
-        reportScores(currentScore, previousHighestScore, previousHighestScoreTime);
     }
 
     /*
@@ -369,25 +369,32 @@ public class WordGame
         final String formattedTime;
         formattedTime = previousHighestScoreTime.format(formatterForTime);
 
-        if(currentScore.getAverageScore() > previousHighestScore)
+        if(currentScore.getAverageScore() == 0)
         {
-            System.out.println("CONGRATULATIONS! You are the new high score with an average of " +
-                    currentScore.getAverageScore() +
-                    " points per game; the previous record was " +
-                    previousHighestScore +
-                    " points per game on " +
-                    formattedDate +
-                    " at " +
-                    formattedTime);
+            System.out.println("It's your first time! The score is 0.");
         }
         else
         {
-            System.out.println("You did not beat the high score of " +
-                    previousHighestScore +
-                    " points per game from " +
-                    formattedDate +
-                    " at " +
-                    formattedTime);
+            if(currentScore.getAverageScore() > previousHighestScore)
+            {
+                System.out.println("CONGRATULATIONS! You are the new high score with an average of " +
+                        currentScore.getAverageScore() +
+                        " points per game; the previous record was " +
+                        previousHighestScore +
+                        " points per game on " +
+                        formattedDate +
+                        " at " +
+                        formattedTime);
+            }
+            else
+            {
+                System.out.println("You did not beat the high score of " +
+                        previousHighestScore +
+                        " points per game from " +
+                        formattedDate +
+                        " at " +
+                        formattedTime);
+            }
         }
     }
 }
