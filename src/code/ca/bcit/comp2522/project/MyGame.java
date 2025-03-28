@@ -25,8 +25,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 
-public class MyGame extends Application {
+public class MyGame extends Application implements Game {
+    private Stage myGameStage;
 
     // Game grid constants
     private static final int GRID_WIDTH = 50;
@@ -44,6 +46,7 @@ public class MyGame extends Application {
     private enum GameState { INTRO, GAME, GAME_OVER }
     private GameState gameState = GameState.INTRO;
     private long gameStartTime;
+    private CountDownLatch gameLatch;
 
     // Player class now gets an extra "finished" flag.
     private static class Player {
@@ -101,6 +104,15 @@ public class MyGame extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        this.myGameStage = primaryStage; // Store the stage for future reference.
+
+        // If the user clicks the [X] button to close the window:
+        primaryStage.setOnCloseRequest(e -> {
+            // We handle it ourselves so that we can do the latch
+            e.consume();            // prevent default close
+            closeGameWindow();      // custom method we define next
+        });
+
         // Set up the canvas and scene.
         Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
         StackPane root = new StackPane(canvas);
@@ -132,7 +144,7 @@ public class MyGame extends Application {
                     initGame();
                     gameState = GameState.GAME;
                 } else if (e.getCode() == KeyCode.ESCAPE) {
-                    Platform.exit();
+                    closeGameWindow();
                 }
             } else if (gameState == GameState.GAME) {
                 if (!gameOver) {
@@ -155,7 +167,7 @@ public class MyGame extends Application {
                     initGame();
                     gameState = GameState.GAME;
                 } else if (e.getCode() == KeyCode.ESCAPE) {
-                    Platform.exit();
+                    closeGameWindow();
                 }
             }
         });
@@ -779,7 +791,26 @@ public class MyGame extends Application {
         putSafeString(gc, baseX, baseY, "/ \\");
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    @Override
+    public void play(final CountDownLatch latch) {
+        this.gameLatch = latch;
+        Stage stage = new Stage();
+        start(stage);
+    }
+
+    /*
+     * Call this when we want to close the game window and let the main menu continue.
+     */
+    private void closeGameWindow() {
+        if (bgm != null && bgm.isPlaying()) {
+            bgm.stop();
+        }
+
+        if (gameLatch != null) {
+            gameLatch.countDown();  // unblocks main-menu thread
+        }
+        if (myGameStage != null) {
+            myGameStage.close();
+        }
     }
 }

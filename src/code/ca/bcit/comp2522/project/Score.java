@@ -23,6 +23,7 @@ import java.util.List;
 public class Score
 {
     private static final int WEIGHT_FOR_FIRST_CORRECT_ATTEMPTS = 2;
+    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     private LocalDateTime currentTime;
     private int numGamesPlayed;
@@ -100,7 +101,7 @@ public class Score
      * Returns a string representation of this Score.
      * <p>
      * The format is:
-     * Date and Time: yyyy-MM-dd HH:mm:ss
+     * Date and Time: {@value #DATE_FORMAT}
      * Games Played: [number]
      * Correct First Attempts: [number]
      * Correct Second Attempts: [number]
@@ -114,7 +115,7 @@ public class Score
     public String toString()
     {
         final DateTimeFormatter formatter;
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
         return String.format(
                 "Date and Time: %s\n" +
@@ -145,7 +146,7 @@ public class Score
     public static void appendScoreToFile(final Score score,
                                          final String scoreFilePath)
     {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         String formattedDateTime = score.currentTime.format(formatter);
 
         // Create a File object and ensure the file exists.
@@ -185,7 +186,7 @@ public class Score
      * <p>
      * The file is expected to contain scores in the following format (one record per block):
      * <pre>
-     * Date and Time: yyyy-MM-dd HH:mm:ss
+     * Date and Time: {@value #DATE_FORMAT}
      * Games Played: [number]
      * Correct First Attempts: [number]
      * Correct Second Attempts: [number]
@@ -201,9 +202,10 @@ public class Score
     public static List<Score> readScoresFromFile(final String scoreFilePath)
     {
         final List<Score> scoresList;
-        scoresList = new ArrayList<>();
         final DateTimeFormatter formatter;
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        scoresList = new ArrayList<>();
+        formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
         try(final BufferedReader reader = new BufferedReader(new FileReader(scoreFilePath)))
         {
@@ -220,20 +222,27 @@ public class Score
                     continue;
                 }
 
-                String dateTimeString = line.substring("Date and Time: ".length()).trim();
-                LocalDateTime dateTime = LocalDateTime.parse(dateTimeString, formatter);
+                final String dateTimeString;
+                final LocalDateTime dateTime;
+
+                dateTimeString = line.substring("Date and Time: ".length()).trim();
+                dateTime = LocalDateTime.parse(dateTimeString, formatter);
 
                 line = reader.readLine();
-                int gamesPlayed = Integer.parseInt(line.substring("Games Played: ".length()).trim());
+                final int gamesPlayed;
+                gamesPlayed = Integer.parseInt(line.substring("Games Played: ".length()).trim());
 
                 line = reader.readLine();
-                int correctFirst = Integer.parseInt(line.substring("Correct First Attempts: ".length()).trim());
+                final int correctFirst;
+                correctFirst = Integer.parseInt(line.substring("Correct First Attempts: ".length()).trim());
 
                 line = reader.readLine();
-                int correctSecond = Integer.parseInt(line.substring("Correct Second Attempts: ".length()).trim());
+                final int correctSecond;
+                correctSecond = Integer.parseInt(line.substring("Correct Second Attempts: ".length()).trim());
 
                 line = reader.readLine();
-                int incorrectAttempts = Integer.parseInt(line.substring("Incorrect Attempts: ".length()).trim());
+                final int incorrectAttempts;
+                incorrectAttempts = Integer.parseInt(line.substring("Incorrect Attempts: ".length()).trim());
 
                 reader.readLine();
 

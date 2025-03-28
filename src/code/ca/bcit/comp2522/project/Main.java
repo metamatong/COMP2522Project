@@ -1,6 +1,10 @@
 package ca.bcit.comp2522.project;
 
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.stage.Stage;
 import java.util.Scanner;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * A class that drives users to play three games presented by this project.
@@ -8,14 +12,55 @@ import java.util.Scanner;
  * @author Kyle Cheon
  * @version 1.0
  */
-class Main
+public class Main extends Application
 {
     private static final String WORD_GAME_INITIAL = "W";
     private static final String NUMBER_GAME_INITIAL = "N";
     private static final String MY_GAME_INITIAL = "M";
     private static final String QUIT_INITIAL = "Q";
 
+    /**
+     * The main entry point of the application.
+     *
+     * @param args the command line arguments
+     */
     public static void main(final String[] args)
+    {
+        // Single launch for the entire application.
+        Application.launch(args);
+    }
+
+    /**
+     * Initializes the JavaFX application.
+     * <p>
+     * This method sets the application to not exit when stages are
+     * closed and launches the main menu logic on a new thread.
+     * </p>
+     *
+     * @param primaryStage the primary stage for this application, onto which the application scene can be set.
+     */
+    @Override
+    public void start(final Stage primaryStage)
+    {
+        // Prevent the application from exiting when a stage is closed.
+        Platform.setImplicitExit(false);
+
+        // Launch the main menu logic on a new thread.
+        final Thread menuThread;
+
+        menuThread = new Thread(this::displayMainMenu);
+
+        menuThread.start();
+    }
+
+    /*
+     * Displays the main menu in the console and handles user input.
+     * <p>
+     * This method continuously presents the menu until the user chooses to quit.
+     * Based on the user's choice, it either launches a game or exits the application.
+     * </p>
+     */
+    private void displayMainMenu()
     {
         final Scanner scanner;
         scanner = new Scanner(System.in);
@@ -42,14 +87,17 @@ class Main
                 final WordGame wordGame;
                 wordGame = new WordGame();
                 wordGame.playWordGame();
+                System.out.println("=== Returned from WordGame ===");
             }
             else if(input.equalsIgnoreCase(NUMBER_GAME_INITIAL))
             {
-                NumberGame.main(new String[]{});
+                launchGame(new NumberGame());
+                System.out.println("=== Returned from NumberGame ===");
             }
             else if(input.equalsIgnoreCase(MY_GAME_INITIAL))
             {
-                MyGame.main(new String[]{});
+                launchGame(new MyGame());
+                System.out.println("=== Returned from MyGame ===");
             }
             else
             {
@@ -58,5 +106,28 @@ class Main
         }
 
         scanner.close();
+    }
+
+    /*
+     * Launches a game that uses JavaFX. The game must implement the Game interface,
+     * meaning it should provide a play(CountDownLatch latch) method that counts down the latch when finished.
+     */
+    private void launchGame(final Game game)
+    {
+        // Create a latch that waits for the game to finish.
+        CountDownLatch gameLatch = new CountDownLatch(1);
+
+        // Schedule the game’s play method on the JavaFX Application Thread.
+        Platform.runLater(() -> game.play(gameLatch));
+
+        try
+        {
+            // Wait until the game signals that it has finished.
+            gameLatch.await();
+        }
+        catch (final InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

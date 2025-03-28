@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.IntStream;
 import java.util.Arrays;
 
@@ -26,9 +27,9 @@ import java.util.Arrays;
  * @version 1.0
  */
 public class NumberGame extends Application
-        implements javafx.event.EventHandler<javafx.event.ActionEvent>
+        implements Game, javafx.event.EventHandler<javafx.event.ActionEvent>
 {
-
+    private CountDownLatch gameLatch;
     private static final int ROWS = 4;
     private static final int COLS = 5;
     private static final int TOTAL_NUMBERS_TO_PLACE = 20;
@@ -59,7 +60,6 @@ public class NumberGame extends Application
     private int numbersPlaced;   // How many we've successfully placed so far
     private boolean gameOver;    // true if player has won or lost already
 
-
     /**
      * Sets up and displays the JavaFX UI for the Number Game.
      *
@@ -70,6 +70,13 @@ public class NumberGame extends Application
     {
         this.primaryStage = primaryStage;
         scoreboard = new BasicScoreboard();
+
+        // If the user clicks the [X] to close the window:
+        primaryStage.setOnCloseRequest(e -> {
+            e.consume();          // prevent default close
+            closeGameWindow();    // custom method
+        });
+
 
         final GridPane gridPane;
         gridPane = new GridPane();
@@ -131,6 +138,25 @@ public class NumberGame extends Application
 
         // Start the first game
         resetGame();
+    }
+
+    /**
+     * Starts the Number Game by creating a new JavaFX Stage and initializing the game UI.
+     * <p>
+     * This method assigns the provided {@code CountDownLatch} to the gameLatch field so that the game
+     * can signal its completion by counting down the latch when the game is over. A new stage is then
+     * created and passed to the {@link #start(Stage)} method to launch the game.
+     * </p>
+     *
+     * @param latch the {@link CountDownLatch} used to signal when the game is complete
+     */
+    @Override
+    public void play(final CountDownLatch latch)
+    {
+        this.gameLatch = latch;
+        final Stage stage;
+        stage = new Stage();
+        start(stage);
     }
 
     // ---------------------
@@ -403,13 +429,21 @@ public class NumberGame extends Application
         }
     }
 
-    /**
-     * The main entry point of the JavaFX application.
-     *
-     * @param args command-line arguments (not used)
+
+    /*
+     * Closes the game window and signals that the game is over.
+     * <p>
+     * If a {@code CountDownLatch} is present, its count is decremented to indicate game completion.
+     * Then, if the primary stage exists, it is closed. This method is typically called when the user
+     * chooses to exit the game.
+     * </p>
      */
-    public static void main(final String[] args)
-    {
-        launch(args);
+    private void closeGameWindow() {
+        if (gameLatch != null) {
+            gameLatch.countDown();
+        }
+        if (primaryStage != null) {
+            primaryStage.close();
+        }
     }
 }

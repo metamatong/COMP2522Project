@@ -109,9 +109,9 @@ class World
     private static void validateCountries(final HashMap<String, Country> countries)
     {
         final boolean countriesIsNull;
-        countriesIsNull = countries == null;
-
         final boolean countriesIsEmpty;
+
+        countriesIsNull = countries == null;
         countriesIsEmpty = countries != null && countries.isEmpty();
 
         if(countriesIsNull || countriesIsEmpty)
@@ -127,9 +127,9 @@ class World
 
             // Validate the country name
             final boolean nameIsNull;
-            nameIsNull = countryName == null;
-
             final boolean nameIsEmpty;
+
+            nameIsNull = countryName == null;
             nameIsEmpty = countryName != null && countryName.isEmpty();
 
             if(nameIsNull || nameIsEmpty)
@@ -162,9 +162,9 @@ class World
     {
         // The first line should be in the format "CountryName:CapitalCityName"
         final String header;
-        header = block.get(FIRST_LINE_DATA_INDEX);
-
         final String[] headerParts;
+
+        header = block.get(FIRST_LINE_DATA_INDEX);
         headerParts = header.split(":", ARRAY_SPLIT_LIMIT_FOR_COUNTRY_HEADER);
 
         if(headerParts.length < ARRAY_SPLIT_LIMIT_FOR_COUNTRY_HEADER)
@@ -174,9 +174,9 @@ class World
         }
 
         final String countryName;
-        countryName = headerParts[FIRST_LINE_DATA_INDEX].trim();
-
         final String capitalCityName;
+
+        countryName = headerParts[FIRST_LINE_DATA_INDEX].trim();
         capitalCityName = headerParts[SECOND_LINE_DATA_INDEX].trim();
 
         // The remaining lines are facts.
@@ -193,6 +193,7 @@ class World
                 factsList.add(fact);
             }
         }
+
         final String[] facts;
         facts = factsList.toArray(new String[EMPTY_ARRAY_LENGTH]);
 

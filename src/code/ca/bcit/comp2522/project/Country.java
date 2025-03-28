@@ -69,9 +69,9 @@ class Country
     private static void validateNames(final String name)
     {
         final boolean nameIsNull;
-        nameIsNull = name == null;
-
         final boolean nameIsEmpty;
+
+        nameIsNull = name == null;
         nameIsEmpty = name != null && name.isEmpty();
 
 
@@ -88,9 +88,9 @@ class Country
     private static void validateFacts(final String[] facts)
     {
         final boolean factsIsNull;
-        factsIsNull = facts == null;
-
         final boolean factsIsEmpty;
+
+        factsIsNull = facts == null;
         factsIsEmpty = facts != null && facts.length == 0;
 
         if(factsIsNull || factsIsEmpty)
