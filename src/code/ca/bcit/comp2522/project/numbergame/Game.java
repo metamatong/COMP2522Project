@@ -1,4 +1,4 @@
-package ca.bcit.comp2522.project;
+package ca.bcit.comp2522.project.numbergame;
 
 import java.util.concurrent.CountDownLatch;
 

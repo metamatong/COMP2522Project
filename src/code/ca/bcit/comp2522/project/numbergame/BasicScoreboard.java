@@ -1,4 +1,4 @@
-package ca.bcit.comp2522.project;
+package ca.bcit.comp2522.project.numbergame;
 
 /**
  * A Class that provides a concrete instance of basic scoreboard implementation.

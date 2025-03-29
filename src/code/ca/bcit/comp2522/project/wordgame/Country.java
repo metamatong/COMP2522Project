@@ -1,4 +1,4 @@
-package ca.bcit.comp2522.project;
+package ca.bcit.comp2522.project.wordgame;
 
 /**
  * A class that represents country information used in the game.

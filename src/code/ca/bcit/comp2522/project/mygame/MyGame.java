@@ -1,9 +1,9 @@
-package ca.bcit.comp2522.project;
+package ca.bcit.comp2522.project.mygame;
 
+import ca.bcit.comp2522.project.numbergame.Game;
 import javafx.animation.AnimationTimer;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;

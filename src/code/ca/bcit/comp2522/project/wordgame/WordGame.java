@@ -1,4 +1,4 @@
-package ca.bcit.comp2522.project;
+package ca.bcit.comp2522.project.wordgame;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ public class WordGame
     /**
      * Constructs a new WordGame and initializes the game world and score list.
      */
-    WordGame()
+    public WordGame()
     {
         final World world;
         world = new World();

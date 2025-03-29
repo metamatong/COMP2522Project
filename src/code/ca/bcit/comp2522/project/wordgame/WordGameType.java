@@ -1,4 +1,4 @@
-package ca.bcit.comp2522.project;
+package ca.bcit.comp2522.project.wordgame;
 
 /**
  * Represents the different types of word games available in the project.

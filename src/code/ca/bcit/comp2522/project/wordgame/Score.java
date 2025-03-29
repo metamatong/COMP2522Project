@@ -1,4 +1,4 @@
-package ca.bcit.comp2522.project;
+package ca.bcit.comp2522.project.wordgame;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

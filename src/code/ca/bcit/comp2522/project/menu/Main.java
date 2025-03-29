@@ -1,5 +1,9 @@
-package ca.bcit.comp2522.project;
+package ca.bcit.comp2522.project.menu;
 
+import ca.bcit.comp2522.project.numbergame.Game;
+import ca.bcit.comp2522.project.numbergame.NumberGame;
+import ca.bcit.comp2522.project.wordgame.WordGame;
+import ca.bcit.comp2522.project.mygame.MyGame;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
