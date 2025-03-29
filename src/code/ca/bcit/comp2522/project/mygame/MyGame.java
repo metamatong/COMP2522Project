@@ -29,6 +29,7 @@ import java.util.concurrent.CountDownLatch;
 
 public class MyGame extends Application implements Game {
     private Stage myGameStage;
+    private AnimationTimer gameLoop;  // store a reference
 
     // Game grid constants
     private static final int GRID_WIDTH = 50;
@@ -181,7 +182,7 @@ public class MyGame extends Application implements Game {
         nextSwitch = 1500 + random.nextInt(4000); // green light duration
         lastLightSwitchTime = System.nanoTime();
 
-        AnimationTimer gameLoop = new AnimationTimer() {
+        gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 if (lastUpdateTime == 0) {
@@ -805,12 +806,27 @@ public class MyGame extends Application implements Game {
         if (bgm != null && bgm.isPlaying()) {
             bgm.stop();
         }
-
+        // Stop the game loop.
+        if (gameLoop != null) {
+            gameLoop.stop();
+        }
         if (gameLatch != null) {
             gameLatch.countDown();  // unblocks main-menu thread
         }
         if (myGameStage != null) {
             myGameStage.close();
+        }
+    }
+
+    @Override
+    public void stop() {
+        // This method is called when the application is exiting.
+        // Do any final cleanup here.
+        if (gameLoop != null) {
+            gameLoop.stop();
+        }
+        if (bgm != null && bgm.isPlaying()) {
+            bgm.stop();
         }
     }
 }

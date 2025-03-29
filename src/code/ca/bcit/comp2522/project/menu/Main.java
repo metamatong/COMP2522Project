@@ -91,17 +91,17 @@ public class Main extends Application
                 final WordGame wordGame;
                 wordGame = new WordGame();
                 wordGame.playWordGame();
-                System.out.println("=== Returned from WordGame ===");
+                System.out.println("\n=== Returned from WordGame ===");
             }
             else if(input.equalsIgnoreCase(NUMBER_GAME_INITIAL))
             {
                 launchGame(new NumberGame());
-                System.out.println("=== Returned from NumberGame ===");
+                System.out.println("\n=== Returned from NumberGame ===");
             }
             else if(input.equalsIgnoreCase(MY_GAME_INITIAL))
             {
                 launchGame(new MyGame());
-                System.out.println("=== Returned from MyGame ===");
+                System.out.println("\n=== Returned from MyGame ===");
             }
             else
             {
