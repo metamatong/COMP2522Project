@@ -14,9 +14,9 @@ import java.io.IOException;
 import static ca.bcit.comp2522.project.mygame.common.GameConfig.CANVAS_HEIGHT_IN_PIXEL;
 import static ca.bcit.comp2522.project.mygame.common.GameConfig.CANVAS_WIDTH_IN_PIXEL;
 import static ca.bcit.comp2522.project.mygame.common.GameConfig.CELL_SIZE_IN_PIXEL;
-import static ca.bcit.comp2522.project.mygame.common.GameConfig.FINISH_LINE_Y;
+import static ca.bcit.comp2522.project.mygame.common.GameConfig.FINISH_LINE_Y_IN_NUMBER_OF_CELLS;
 import static ca.bcit.comp2522.project.mygame.common.GameConfig.STAT_HEIGHT_IN_PIXEL;
-import static ca.bcit.comp2522.project.mygame.common.GameConfig.TOP_MARGIN;
+import static ca.bcit.comp2522.project.mygame.common.GameConfig.TOP_MARGIN_IN_PIXEL;
 import static ca.bcit.comp2522.project.mygame.util.DrawingUtils.computeTextWidth;
 import static ca.bcit.comp2522.project.mygame.util.DrawingUtils.putSafeString;
 
@@ -112,7 +112,7 @@ public class GameRenderer
 
     private void drawGame(GraphicsContext gc) {
         // Compute elapsed time in seconds.
-        double elapsedSeconds = (System.nanoTime() - gameLogic.getGameStartTime()) / 1_000_000_000.0;
+        double elapsedSeconds = (System.nanoTime() - gameLogic.getGameStartTimeInNanoseconds()) / 1_000_000_000.0;
 
         // Count dead players.
         int deadCount = 0;
@@ -124,7 +124,7 @@ public class GameRenderer
 
         // Clear previous stats
         gc.setFill(Color.BLACK);
-        gc.fillRect(0, TOP_MARGIN, CANVAS_WIDTH_IN_PIXEL, STAT_HEIGHT_IN_PIXEL);
+        gc.fillRect(0, TOP_MARGIN_IN_PIXEL, CANVAS_WIDTH_IN_PIXEL, STAT_HEIGHT_IN_PIXEL);
 
         // Prepare the stats string.
         String stats = String.format("Time: %.1fs   Finished: %d   Dead: %d",
@@ -133,11 +133,11 @@ public class GameRenderer
         // Draw the stats at the top left (using a smaller font so it fits nicely).
         gc.setFill(Color.YELLOW);
         gc.setFont(Font.font("Monospaced", CELL_SIZE_IN_PIXEL * 3 / 5));
-        gc.fillText(stats, 5, TOP_MARGIN + CELL_SIZE_IN_PIXEL / 2);
+        gc.fillText(stats, 5, TOP_MARGIN_IN_PIXEL + CELL_SIZE_IN_PIXEL / 2);
 
         gc.setFill(Color.BLACK);
         // Clear only below the header area.
-        gc.fillRect(0, TOP_MARGIN + STAT_HEIGHT_IN_PIXEL, CANVAS_WIDTH_IN_PIXEL, CANVAS_HEIGHT_IN_PIXEL - TOP_MARGIN - STAT_HEIGHT_IN_PIXEL);
+        gc.fillRect(0, TOP_MARGIN_IN_PIXEL + STAT_HEIGHT_IN_PIXEL, CANVAS_WIDTH_IN_PIXEL, CANVAS_HEIGHT_IN_PIXEL - TOP_MARGIN_IN_PIXEL - STAT_HEIGHT_IN_PIXEL);
 
         gc.setFont(Font.font("Monospaced", CELL_SIZE_IN_PIXEL));
         gc.setTextAlign(TextAlignment.LEFT);
@@ -148,7 +148,7 @@ public class GameRenderer
             drawGreenMachine(gc);
         }
 
-        double finishLineYCanvas = FINISH_LINE_Y * CELL_SIZE_IN_PIXEL + TOP_MARGIN + STAT_HEIGHT_IN_PIXEL;
+        double finishLineYCanvas = FINISH_LINE_Y_IN_NUMBER_OF_CELLS * CELL_SIZE_IN_PIXEL + TOP_MARGIN_IN_PIXEL + STAT_HEIGHT_IN_PIXEL;
 
         // Set the stroke properties.
         gc.setStroke(Color.DARKGREEN); // Choose a visible color.
@@ -241,7 +241,7 @@ public class GameRenderer
         // Adjust the width calculation factor as needed (here CELL_SIZE*0.6 is an approximate width per character).
         double dollWidth = doll[0].length() * (CELL_SIZE_IN_PIXEL * 0.6);
         double startX = (CANVAS_WIDTH_IN_PIXEL - dollWidth) / 2;
-        double startY = TOP_MARGIN + STAT_HEIGHT_IN_PIXEL; // Position below the header.
+        double startY = TOP_MARGIN_IN_PIXEL + STAT_HEIGHT_IN_PIXEL; // Position below the header.
 
         // Draw each line of the doll.
         for (int i = 0; i < doll.length; i++) {
@@ -265,7 +265,7 @@ public class GameRenderer
         // Compute starting position to center the doll.
         double dollWidth = doll[0].length() * (CELL_SIZE_IN_PIXEL * 0.6);
         double startX = (CANVAS_WIDTH_IN_PIXEL - dollWidth) / 2;
-        double startY = TOP_MARGIN + STAT_HEIGHT_IN_PIXEL; // same position as red light
+        double startY = TOP_MARGIN_IN_PIXEL + STAT_HEIGHT_IN_PIXEL; // same position as red light
 
         // Draw each line of the doll.
         for (int i = 0; i < doll.length; i++) {
@@ -275,7 +275,7 @@ public class GameRenderer
 
     private void drawDeadSprite(GraphicsContext gc, Player p) {
         double baseX = (p.getX() - 1) * CELL_SIZE_IN_PIXEL;
-        double baseY = p.getY() * CELL_SIZE_IN_PIXEL + TOP_MARGIN + STAT_HEIGHT_IN_PIXEL;
+        double baseY = p.getY() * CELL_SIZE_IN_PIXEL + TOP_MARGIN_IN_PIXEL + STAT_HEIGHT_IN_PIXEL;
         gc.setFill(Color.GRAY); // Use gray to indicate death.
         // Draw a dead body.
         putSafeString(gc, baseX, baseY - 2 * CELL_SIZE_IN_PIXEL, "  ____");
@@ -284,7 +284,7 @@ public class GameRenderer
 
     private void drawPlayerSprite(GraphicsContext gc, Player p) {
         double baseX = (p.getX() - 1) * CELL_SIZE_IN_PIXEL;
-        double baseY = p.getY() * CELL_SIZE_IN_PIXEL + TOP_MARGIN + STAT_HEIGHT_IN_PIXEL;
+        double baseY = p.getY() * CELL_SIZE_IN_PIXEL + TOP_MARGIN_IN_PIXEL + STAT_HEIGHT_IN_PIXEL;
         if (p.isUser()) {
             gc.setFill(Color.CYAN);
             if (p.isPushing()) {

@@ -40,7 +40,7 @@ public class Score
      * @param numCorrectSecondAttempts the number of questions answered correctly on the second attempt
      * @param numIncorrectTwoAttempts  the number of questions answered incorrectly after two attempts
      */
-    Score(final LocalDateTime currentTime,
+    public Score(final LocalDateTime currentTime,
           final int numGamesPlayed,
           final int numCorrectFirstAttempts,
           final int numCorrectSecondAttempts,

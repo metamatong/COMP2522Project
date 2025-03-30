@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
-import static ca.bcit.comp2522.project.mygame.common.GameConfig.BOTTOM_MARGIN;
+import static ca.bcit.comp2522.project.mygame.common.GameConfig.BOTTOM_MARGIN_IN_PIXEL;
 import static ca.bcit.comp2522.project.mygame.common.GameConfig.CELL_SIZE_IN_PIXEL;
-import static ca.bcit.comp2522.project.mygame.common.GameConfig.GRID_HEIGHT;
-import static ca.bcit.comp2522.project.mygame.common.GameConfig.GRID_WIDTH;
-import static ca.bcit.comp2522.project.mygame.common.GameConfig.TOP_MARGIN;
+import static ca.bcit.comp2522.project.mygame.common.GameConfig.GRID_HEIGHT_IN_NUMBER_OF_CELLS;
+import static ca.bcit.comp2522.project.mygame.common.GameConfig.GRID_WIDTH_IN_NUMBER_OF_CELLS;
+import static ca.bcit.comp2522.project.mygame.common.GameConfig.TOP_MARGIN_IN_PIXEL;
 import static ca.bcit.comp2522.project.mygame.util.DrawingUtils.directionDeltaX;
 import static ca.bcit.comp2522.project.mygame.util.DrawingUtils.directionDeltaY;
 
@@ -38,8 +38,8 @@ public class MyGame extends Application implements JavaFXGame {
     private SoundManager soundManager;
 
     // Game grid constants
-    private static final int CANVAS_WIDTH = GRID_WIDTH * CELL_SIZE_IN_PIXEL;
-    private static final int CANVAS_HEIGHT = GRID_HEIGHT * CELL_SIZE_IN_PIXEL + TOP_MARGIN + BOTTOM_MARGIN;
+    private static final int CANVAS_WIDTH = GRID_WIDTH_IN_NUMBER_OF_CELLS * CELL_SIZE_IN_PIXEL;
+    private static final int CANVAS_HEIGHT = GRID_HEIGHT_IN_NUMBER_OF_CELLS * CELL_SIZE_IN_PIXEL + TOP_MARGIN_IN_PIXEL + BOTTOM_MARGIN_IN_PIXEL;
 
     // Game states
     private GameState gameState = GameState.INTRO;
@@ -122,8 +122,8 @@ public class MyGame extends Application implements JavaFXGame {
         gc.setTextBaseline(VPos.TOP);
 
         // Initialize timing for game logic updates and light switching.
-        gameLogic.setNextSwitch(1500 + random.nextInt(4000)); // green light duration
-        gameLogic.setLastLightSwitchTime(System.nanoTime());
+        gameLogic.setNextSwitchInMilliseconds(1500 + random.nextInt(4000)); // green light duration
+        gameLogic.setLastLightSwitchTimeInNanoseconds(System.nanoTime());
 
         gameLoop = new AnimationTimer() {
             @Override
