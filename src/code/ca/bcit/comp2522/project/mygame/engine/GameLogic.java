@@ -79,6 +79,7 @@ public class GameLogic
      */
     public GameLogic(final SoundManager soundManager)
     {
+        validateSoundManager(soundManager);
         this.soundManager = soundManager;
     }
 
@@ -385,7 +386,7 @@ public class GameLogic
         now = System.nanoTime();
 
         // Allow the move only if the cooldown has elapsed.
-        if(now - p.getLastMoveTime() < MOVE_COOLDOWN_IN_NANOSECONDS)
+        if(now - p.getLastMoveTimestampInNanoseconds() < MOVE_COOLDOWN_IN_NANOSECONDS)
         {
             return false;
         }
@@ -472,7 +473,8 @@ public class GameLogic
      * @param y the y-coordinate of the grid cell.
      * @return the player at the specified cell, or {@code null} if no non-eliminated player occupies it.
      */
-    private Player getPlayerAt(final int x, final int y)
+    private Player getPlayerAt(final int x,
+                               final int y)
     {
         for(final Player p : players)
         {
@@ -541,5 +543,19 @@ public class GameLogic
             }
         });
         delay.play();
+    }
+
+    /*
+     * Validates that the provided SoundManager is not null.
+     *
+     * @param soundManager the SoundManager instance to validate.
+     * @throws IllegalArgumentException if soundManager is null.
+     */
+    private static void validateSoundManager(final SoundManager soundManager)
+    {
+        if(soundManager == null)
+        {
+            throw new IllegalArgumentException("SoundManager cannot be null.");
+        }
     }
 }
