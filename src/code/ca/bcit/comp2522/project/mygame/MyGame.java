@@ -24,7 +24,7 @@ import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
 import static ca.bcit.comp2522.project.mygame.common.GameConfig.BOTTOM_MARGIN;
-import static ca.bcit.comp2522.project.mygame.common.GameConfig.CELL_SIZE;
+import static ca.bcit.comp2522.project.mygame.common.GameConfig.CELL_SIZE_IN_PIXEL;
 import static ca.bcit.comp2522.project.mygame.common.GameConfig.GRID_HEIGHT;
 import static ca.bcit.comp2522.project.mygame.common.GameConfig.GRID_WIDTH;
 import static ca.bcit.comp2522.project.mygame.common.GameConfig.TOP_MARGIN;
@@ -38,8 +38,8 @@ public class MyGame extends Application implements JavaFXGame {
     private SoundManager soundManager;
 
     // Game grid constants
-    private static final int CANVAS_WIDTH = GRID_WIDTH * CELL_SIZE;
-    private static final int CANVAS_HEIGHT = GRID_HEIGHT * CELL_SIZE + TOP_MARGIN + BOTTOM_MARGIN;
+    private static final int CANVAS_WIDTH = GRID_WIDTH * CELL_SIZE_IN_PIXEL;
+    private static final int CANVAS_HEIGHT = GRID_HEIGHT * CELL_SIZE_IN_PIXEL + TOP_MARGIN + BOTTOM_MARGIN;
 
     // Game states
     private GameState gameState = GameState.INTRO;
@@ -117,7 +117,7 @@ public class MyGame extends Application implements JavaFXGame {
         });
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFont(Font.font("Monospaced", CELL_SIZE));
+        gc.setFont(Font.font("Monospaced", CELL_SIZE_IN_PIXEL));
         gc.setTextAlign(TextAlignment.LEFT);
         gc.setTextBaseline(VPos.TOP);
 

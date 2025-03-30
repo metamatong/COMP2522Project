@@ -1,7 +1,6 @@
 package ca.bcit.comp2522.project.mygame.engine;
 
 import ca.bcit.comp2522.project.mygame.audio.SoundManager;
-import ca.bcit.comp2522.project.mygame.common.GameState;
 import ca.bcit.comp2522.project.mygame.common.MovementDirection;
 import ca.bcit.comp2522.project.mygame.entities.Player;
 import javafx.animation.PauseTransition;
@@ -14,7 +13,7 @@ import java.util.Random;
 import static ca.bcit.comp2522.project.mygame.common.GameConfig.FINISH_LINE_Y;
 import static ca.bcit.comp2522.project.mygame.common.GameConfig.GRID_HEIGHT;
 import static ca.bcit.comp2522.project.mygame.common.GameConfig.GRID_WIDTH;
-import static ca.bcit.comp2522.project.mygame.common.GameConfig.MOVE_COOLDOWN;
+import static ca.bcit.comp2522.project.mygame.common.GameConfig.MOVE_COOLDOWN_NANOSECONDS;
 import static ca.bcit.comp2522.project.mygame.util.DrawingUtils.directionDeltaX;
 import static ca.bcit.comp2522.project.mygame.util.DrawingUtils.directionDeltaY;
 
@@ -202,7 +201,7 @@ public class GameLogic
     public boolean tryMoveWithPush(Player p, int dx, int dy, List<Player> visited, boolean initiating) {
         long now = System.nanoTime();
         // Only allow the move if the cooldown has elapsed
-        if (now - p.getLastMoveTime() < MOVE_COOLDOWN) {
+        if (now - p.getLastMoveTime() < MOVE_COOLDOWN_NANOSECONDS) {
             return false;
         }
 

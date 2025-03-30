@@ -5,9 +5,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-import static ca.bcit.comp2522.project.mygame.common.GameConfig.CANVAS_HEIGHT;
-import static ca.bcit.comp2522.project.mygame.common.GameConfig.CANVAS_WIDTH;
-import static ca.bcit.comp2522.project.mygame.common.GameConfig.CELL_SIZE;
+import static ca.bcit.comp2522.project.mygame.common.GameConfig.CANVAS_HEIGHT_IN_PIXEL;
+import static ca.bcit.comp2522.project.mygame.common.GameConfig.CANVAS_WIDTH_IN_PIXEL;
+import static ca.bcit.comp2522.project.mygame.common.GameConfig.CELL_SIZE_IN_PIXEL;
 
 public class DrawingUtils
 {
@@ -19,8 +19,8 @@ public class DrawingUtils
 
     // Draws a string if within canvas bounds.
     public static void putSafeString(GraphicsContext gc, double x, double y, String s) {
-        if (x + s.length() * CELL_SIZE / 2 < 0 || x > CANVAS_WIDTH) return;
-        if (y < 0 || y > CANVAS_HEIGHT) return;
+        if (x + s.length() * CELL_SIZE_IN_PIXEL / 2 < 0 || x > CANVAS_WIDTH_IN_PIXEL) return;
+        if (y < 0 || y > CANVAS_HEIGHT_IN_PIXEL) return;
         gc.fillText(s, x, y);
     }
 
