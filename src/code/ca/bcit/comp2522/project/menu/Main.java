@@ -49,7 +49,9 @@ public class Main extends Application
         // Prevent the application from exiting when a stage is closed.
         Platform.setImplicitExit(false);
 
-        // Launch the main menu logic on a new thread.
+        // Launch the main menu logic on a new thread. This will ensure overall
+        // latch design possible by making this thread wait for JavaFX Application Thread
+        // to end its job.
         final Thread menuThread;
 
         menuThread = new Thread(this::displayMainMenu);
@@ -84,6 +86,7 @@ public class Main extends Application
             if(input.equalsIgnoreCase(QUIT_INITIAL))
             {
                 System.out.println("Goodbye!");
+                Platform.exit();
                 break;
             }
             else if(input.equalsIgnoreCase(WORD_GAME_INITIAL))
