@@ -9,6 +9,8 @@ import java.util.concurrent.CountDownLatch;
  * {@link #play(CountDownLatch)} method. When the game is complete, the implementation
  * should signal its completion by calling {@code latch.countDown()}.
  * </p>
+ * @author Kyle Cheon
+ * @version 1.0
  */
 public interface JavaFXGame
 {
