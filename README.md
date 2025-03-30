@@ -24,9 +24,9 @@ This repository contains three Java-based games—**WordGame**, **NumberGame**, 
 
 The goal of this project is to create three distinct games showcasing proper Java coding techniques, data structures, OOP design, file I/O, and user interaction via both console menus and a graphical user interface (GUI). The three games are:
 
-- **WordGame**: A text-based geography trivia game (played in the terminal).
+- **WordGame**: A text-based geography trivia javaFXGame (played in the terminal).
 - **NumberGame**: A GUI-based puzzle where players must place generated numbers in ascending order.
-- **MyGame**: A unique, original game idea created with the help of an AI assistant—while still following the coding patterns and style guidelines learned in this course.
+- **MyGame**: A unique, original javaFXGame idea created with the help of an AI assistant—while still following the coding patterns and style guidelines learned in this course.
 
 The user navigates between these games via the `Main` class, which presents a menu in an infinite loop until the user decides to quit.
 
@@ -52,11 +52,11 @@ The user navigates between these games via the `Main` class, which presents a me
 3. **NumberGame.java**
     - Provides a 4×5 grid in a GUI.
     - Randomly generates 20 integers from 1–1000.
-    - Users must place each number into an empty cell, maintaining ascending order or face a game-over.
+    - Users must place each number into an empty cell, maintaining ascending order or face a javaFXGame-over.
     - Tracks wins/losses, average placements, and allows replays.
 
 4. **MyGame.java**
-    - A unique game demonstrating concepts from the entire course.
+    - A unique javaFXGame demonstrating concepts from the entire course.
     - Must include a `prompts.txt` describing how AI was used and an `applications.txt` indicating where course concepts appear.
     - Must maintain consistent style, follow best practices, and be distinct from publicly-available code.
 
@@ -73,7 +73,7 @@ The user navigates between these games via the `Main` class, which presents a me
         - `int numCorrectFirstAttempt`
         - `int numCorrectSecondAttempt`
         - `int numIncorrectTwoAttempts`
-    - Writes to/reads from `score.txt` and helps identify high score (points per game).
+    - Writes to/reads from `score.txt` and helps identify high score (points per javaFXGame).
 
 7. **Additional Interfaces & Classes**
     - For **NumberGame**, at least one interface, one abstract class, and one concrete class are required.
@@ -101,12 +101,12 @@ A console-based trivia quiz about world geography. It randomly generates 10 ques
     - Correct answers on the second attempt
     - Incorrect answers (two failed attempts)
 - Offer to **Play Again** or **Quit**:
-    - If "Yes" (any capitalization), reset for another game.
+    - If "Yes" (any capitalization), reset for another javaFXGame.
     - If "No" (any capitalization), exit to the main menu.
     - Invalid input re-prompts the user.
 - Upon exiting WordGame:
     - Results are appended to `score.txt`.
-    - Check for a “high score” (highest average points per game):
+    - Check for a “high score” (highest average points per javaFXGame):
         - If new record: Congratulate the user and show the old record’s details.
         - Otherwise: Display the existing high score record.
 
@@ -123,19 +123,19 @@ A GUI-based puzzle where 20 random numbers (1–1000) are drawn one at a time, a
         - Total games played
         - Wins and losses
         - Number of successful placements
-        - Average placements per game
-    - At game end, offer **Try Again** or **Quit**:
+        - Average placements per javaFXGame
+    - At javaFXGame end, offer **Try Again** or **Quit**:
         - **Try Again** → Resets the grid and draws new random numbers.
         - **Quit** → Returns to the main menu and displays summary stats.
 
 ### MyGame
 
-A **unique and personal** game you design in Java. Must:
+A **unique and personal** javaFXGame you design in Java. Must:
 - Use concepts from each lesson of the course, as documented in `applications.txt`.
 - Involve an **AI prompt** workflow, documented in `prompts.txt`.
 - Maintain consistent style with the rest of the project.
 
-Examples of potential game ideas:
+Examples of potential javaFXGame ideas:
 - A textual puzzle combining elements of Sudoku and Wordle.
 - A side-scrolling or turn-based logic puzzle (console-based or minimal GUI is allowed).
 
@@ -143,9 +143,9 @@ Examples of potential game ideas:
 
 ## Score Tracking
 
-For the **WordGame**, all game attempts and results are stored in a text file named `score.txt`. The **Score** class manages the following:
+For the **WordGame**, all javaFXGame attempts and results are stored in a text file named `score.txt`. The **Score** class manages the following:
 
-- **Date and time of the game session** (using `LocalDateTime` and `DateTimeFormatter`).
+- **Date and time of the javaFXGame session** (using `LocalDateTime` and `DateTimeFormatter`).
 - **Number of games played** during the session.
 - **Number of correct first-attempt answers**.
 - **Number of correct second-attempt answers**.

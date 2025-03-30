@@ -1,12 +1,12 @@
 package ca.bcit.comp2522.project.mygame;
 
+import ca.bcit.comp2522.project.menu.JavaFXGame;
 import ca.bcit.comp2522.project.mygame.audio.SoundManager;
 import ca.bcit.comp2522.project.mygame.common.GameState;
 import ca.bcit.comp2522.project.mygame.common.MovementDirection;
 import ca.bcit.comp2522.project.mygame.engine.GameLogic;
 import ca.bcit.comp2522.project.mygame.entities.Player;
 import ca.bcit.comp2522.project.mygame.ui.GameRenderer;
-import ca.bcit.comp2522.project.numbergame.Game;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.VPos;
@@ -31,7 +31,7 @@ import static ca.bcit.comp2522.project.mygame.common.GameConfig.TOP_MARGIN;
 import static ca.bcit.comp2522.project.mygame.util.DrawingUtils.directionDeltaX;
 import static ca.bcit.comp2522.project.mygame.util.DrawingUtils.directionDeltaY;
 
-public class MyGame extends Application implements Game {
+public class MyGame extends Application implements JavaFXGame {
     private Stage myGameStage;
     private AnimationTimer gameLoop;  // store a reference
     private GameLogic gameLogic;

@@ -1,6 +1,5 @@
 package ca.bcit.comp2522.project.menu;
 
-import ca.bcit.comp2522.project.numbergame.Game;
 import ca.bcit.comp2522.project.numbergame.NumberGame;
 import ca.bcit.comp2522.project.wordgame.WordGame;
 import ca.bcit.comp2522.project.mygame.MyGame;
@@ -118,13 +117,13 @@ public class Main extends Application
      * This design is necessary to ensure that main menu runs again after exiting each game that runs on JavaFX
      * Application Thread.
      */
-    private void launchGame(final Game game)
+    private void launchGame(final JavaFXGame javaFXGame)
     {
         // Create a latch that waits for the game to finish.
         CountDownLatch gameLatch = new CountDownLatch(LATCH_COUNT_DOWN);
 
         // Schedule the game’s play method on the JavaFX Application Thread.
-        Platform.runLater(() -> game.play(gameLatch));
+        Platform.runLater(() -> javaFXGame.play(gameLatch));
 
         try
         {

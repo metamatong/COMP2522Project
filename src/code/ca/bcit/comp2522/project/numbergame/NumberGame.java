@@ -1,5 +1,6 @@
 package ca.bcit.comp2522.project.numbergame;
 
+import ca.bcit.comp2522.project.menu.JavaFXGame;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
@@ -27,7 +28,7 @@ import java.util.Arrays;
  * @version 1.0
  */
 public class NumberGame extends Application
-        implements Game, javafx.event.EventHandler<javafx.event.ActionEvent>
+        implements JavaFXGame, javafx.event.EventHandler<javafx.event.ActionEvent>
 {
     private CountDownLatch gameLatch;
     private static final int ROWS = 4;
