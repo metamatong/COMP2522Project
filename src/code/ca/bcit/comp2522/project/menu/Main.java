@@ -22,6 +22,7 @@ public class Main extends Application
     private static final String NUMBER_GAME_INITIAL = "N";
     private static final String MY_GAME_INITIAL = "M";
     private static final String QUIT_INITIAL = "Q";
+    private static final int LATCH_COUNT_DOWN = 1;
 
     /**
      * The main entry point of the application.
@@ -108,25 +109,26 @@ public class Main extends Application
                 System.out.println("Wrong input. Please try again.");
             }
         }
-
         scanner.close();
     }
 
     /*
      * Launches a game that uses JavaFX. The game must implement the Game interface,
      * meaning it should provide a play(CountDownLatch latch) method that counts down the latch when finished.
+     * This design is necessary to ensure that main menu runs again after exiting each game that runs on JavaFX
+     * Application Thread.
      */
     private void launchGame(final Game game)
     {
         // Create a latch that waits for the game to finish.
-        CountDownLatch gameLatch = new CountDownLatch(1);
+        CountDownLatch gameLatch = new CountDownLatch(LATCH_COUNT_DOWN);
 
         // Schedule the game’s play method on the JavaFX Application Thread.
         Platform.runLater(() -> game.play(gameLatch));
 
         try
         {
-            // Wait until the game signals that it has finished.
+            // Wait until the game calls countDown() method.
             gameLatch.await();
         }
         catch (final InterruptedException e)
