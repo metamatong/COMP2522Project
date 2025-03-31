@@ -20,6 +20,8 @@ import java.time.format.DateTimeFormatter;
 public class WordGame
 {
     private static final int NUMBER_OF_QUESTIONS = 10;
+    private static final int INITIAL_HIGH_SCORE = 0;
+    private static final int INITIAL_AVERAGE_SCORE = 0;
 
     private final World world;
     private int playedGameNumber = 0;
@@ -108,15 +110,16 @@ public class WordGame
             System.out.println(thirdAttemptNumber + " incorrect answers on two attempts each.");
 
             boolean validResponse = false;
-            while (!validResponse) {
-
+            while(!validResponse)
+            {
                 System.out.println("Do you want to play again? (yes/no):");
                 final String inputToPlayAgain;
                 inputToPlayAgain = scanner.nextLine();
                 final String normalizedInput;
                 normalizedInput = inputToPlayAgain.trim().toLowerCase();
 
-                switch (normalizedInput) {
+                switch(normalizedInput)
+                {
                     case "yes":
                         validResponse = true;
                         break;
@@ -144,12 +147,12 @@ public class WordGame
     private String[] getWordGameQuestionAndAnswer()
     {
         // Using WordGameType enum for choosing game type.
-        WordGameType[] gameTypes = WordGameType.values();
-
+        final WordGameType[] gameTypes;
         final Random random;
-        random = new Random();
-
         final int randomIndex;
+
+        random = new Random();
+        gameTypes = WordGameType.values();
         randomIndex = random.nextInt(gameTypes.length);
 
         // Select a random game type
@@ -180,7 +183,6 @@ public class WordGame
                 yield null;
             }
         };
-
         return questionAndAnswerPair;
     }
 
@@ -196,25 +198,20 @@ public class WordGame
     private String[] fetchCapitalQuestionAndAnswer()
     {
         final Map<String, Country> countries;
-        countries = world.getCountries();
-
         // We change HashMap into a List to randomly select any Country object.
         final List<Country> countriesList;
-        countriesList = new ArrayList<>(countries.values());
-
         final Random random;
-        random = new Random();
-
         final int randomIndex;
-        randomIndex = random.nextInt(countriesList.size());
-
         final Country randomCountry;
-        randomCountry = countriesList.get(randomIndex);
-
         final String question;
-        question = randomCountry.getCapitalCityName();
-
         final String answer;
+
+        countries = world.getCountries();
+        countriesList = new ArrayList<>(countries.values());
+        random = new Random();
+        randomIndex = random.nextInt(countriesList.size());
+        randomCountry = countriesList.get(randomIndex);
+        question = randomCountry.getCapitalCityName();
         answer = randomCountry.getCountryName();
 
         return new String[] { question, answer };
@@ -232,25 +229,20 @@ public class WordGame
     private String[] fetchCountryQuestionAndAnswer()
     {
         final Map<String, Country> countries;
-        countries = world.getCountries();
-
         // We change HashMap into a List to randomly select any Country object.
         final List<Country> countriesList;
-        countriesList = new ArrayList<>(countries.values());
-
         final Random random;
-        random = new Random();
-
         final int randomIndex;
-        randomIndex = random.nextInt(countriesList.size());
-
         final Country randomCountry;
-        randomCountry = countriesList.get(randomIndex);
-
         final String question;
-        question = randomCountry.getCountryName();
-
         final String answer;
+
+        countries = world.getCountries();
+        countriesList = new ArrayList<>(countries.values());
+        random = new Random();
+        randomIndex = random.nextInt(countriesList.size());
+        randomCountry = countriesList.get(randomIndex);
+        question = randomCountry.getCountryName();
         answer = randomCountry.getCapitalCityName();
 
         return new String[] { question, answer };
@@ -268,28 +260,22 @@ public class WordGame
     private String[] fetchFactQuestionAndAnswer()
     {
         final Map<String, Country> countries;
-        countries = world.getCountries();
-
         // We change HashMap into a List to randomly select any Country object.
         final List<Country> countriesList;
-        countriesList = new ArrayList<>(countries.values());
-
         final Random random;
-        random = new Random();
-
         final int randomIndex;
-        randomIndex = random.nextInt(countriesList.size());
-
         final Country randomCountry;
-        randomCountry = countriesList.get(randomIndex);
-
         final int randomIndexForFact;
-        randomIndexForFact = random.nextInt(randomCountry.getFactsArray().length);
-
         final String question;
-        question = randomCountry.getFactsArray()[randomIndexForFact];
-
         final String answer;
+
+        countries = world.getCountries();
+        countriesList = new ArrayList<>(countries.values());
+        random = new Random();
+        randomIndex = random.nextInt(countriesList.size());
+        randomCountry = countriesList.get(randomIndex);
+        randomIndexForFact = random.nextInt(randomCountry.getFactsArray().length);
+        question = randomCountry.getFactsArray()[randomIndexForFact];
         answer = randomCountry.getCountryName();
 
         return new String[] { question, answer };
@@ -307,20 +293,20 @@ public class WordGame
     private void saveScoresToFile()
     {
         final String scoreFileUrl;
-        scoreFileUrl = "src/res/scores/scores.txt";
-
         final LocalDateTime currentTime;
-        currentTime = LocalDateTime.now();
+        final Score currentScore;
 
-        final Score currentScore = new Score(currentTime,
-                                             playedGameNumber,
-                                             firstAttemptCorrectNumber,
-                                             secondAttemptCorrectNumber,
-                                             thirdAttemptNumber);
+        scoreFileUrl = "src/res/scores/scores.txt";
+        currentTime = LocalDateTime.now();
+        currentScore = new Score(currentTime,
+                                 playedGameNumber,
+                                 firstAttemptCorrectNumber,
+                                 secondAttemptCorrectNumber,
+                                 thirdAttemptNumber);
 
 
         double previousHighestScore;
-        previousHighestScore = 0;
+        previousHighestScore = INITIAL_HIGH_SCORE;
 
         LocalDateTime previousHighestScoreTime;
         previousHighestScoreTime = LocalDateTime.now();
@@ -358,18 +344,16 @@ public class WordGame
                               final LocalDateTime previousHighestScoreTime)
     {
         final DateTimeFormatter formatterForDate;
-        formatterForDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
         final DateTimeFormatter formatterForTime;
-        formatterForTime = DateTimeFormatter.ofPattern("HH:mm:ss");
-
         final String formattedDate;
-        formattedDate = previousHighestScoreTime.format(formatterForDate);
-
         final String formattedTime;
+
+        formatterForDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        formatterForTime = DateTimeFormatter.ofPattern("HH:mm:ss");
+        formattedDate = previousHighestScoreTime.format(formatterForDate);
         formattedTime = previousHighestScoreTime.format(formatterForTime);
 
-        if(currentScore.getAverageScore() == 0)
+        if(currentScore.getAverageScore() == INITIAL_AVERAGE_SCORE)
         {
             System.out.println("It's your first time! The score is 0.");
         }

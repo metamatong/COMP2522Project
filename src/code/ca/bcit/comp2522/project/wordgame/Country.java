@@ -8,6 +8,8 @@ package ca.bcit.comp2522.project.wordgame;
  */
 class Country
 {
+    private static final int ZERO_VALUE = 0;
+
     private final String name;
     private final String capitalCityName;
     private final String[] facts;
@@ -91,7 +93,7 @@ class Country
         final boolean factsIsEmpty;
 
         factsIsNull = facts == null;
-        factsIsEmpty = facts != null && facts.length == 0;
+        factsIsEmpty = facts != null && facts.length == ZERO_VALUE;
 
         if(factsIsNull || factsIsEmpty)
         {

@@ -36,12 +36,21 @@ public class NumberGame extends Application
     private static final int TOTAL_NUMBERS_TO_PLACE = 20;
     private static final int NUMBER_UPPERBOUND = 1000;
     private static final int ZERO_VALUE = 0;
-    private static final int SCENE_WIDTH = 400;
-    private static final int SCENE_HEIGTH = 260;
-    private static final int HBOX_HEIGHT = 20;
-    private static final int VBOX_WIDTH = 10;
-    private static final int BUTTON_MIN_WIDTH = 60;
-    private static final int BUTTON_MIN_HEIGHT = 40;
+    private static final int SCENE_WIDTH_IN_PIXELS = 400;
+    private static final int SCENE_HEIGTH_IN_PIXELS = 260;
+    private static final int HBOX_HEIGHT_IN_PIXELS = 20;
+    private static final int VBOX_WIDTH_IN_PIXELS = 10;
+    private static final int BUTTON_MIN_WIDTH_IN_PIXELS = 60;
+    private static final int BUTTON_MIN_HEIGHT_IN_PIXELS = 40;
+    private static final int INTEGER_RANGE_ZERO = 0;
+    private static final int INTEGER_RANGE_ONE = 1;
+    private static final int INTEGER_VALUE_ZERO = 0;
+    private static final int GRID_PANE_GAP_IN_PIXELS = 5;
+    private static final double A_HUNDRED_PERCENT = 100.0;
+    private static final int ROW_INDEX_DEFAULT_VALUE = -1;
+    private static final int COLUMN_INDEX_DEFAULT_VALUE = -1;
+    private static final int RANDOM_NUMBER_ADJUSTMENT = 1;
+    private static final int RANGE_ADJUSTER_ONE = 1;
     private Stage primaryStage;
 
     // Embedded scoreboard
@@ -81,33 +90,33 @@ public class NumberGame extends Application
 
         final GridPane gridPane;
         gridPane = new GridPane();
-        gridPane.setHgap(5);
-        gridPane.setVgap(5);
+        gridPane.setHgap(GRID_PANE_GAP_IN_PIXELS);
+        gridPane.setVgap(GRID_PANE_GAP_IN_PIXELS);
         gridPane.setMaxWidth(Double.MAX_VALUE);
         gridPane.setMaxHeight(Double.MAX_VALUE);
 
-        IntStream.range(0, COLS).forEach(i ->
+        IntStream.range(INTEGER_RANGE_ZERO, COLS).forEach(i ->
         {
             final ColumnConstraints cc;
             cc = new ColumnConstraints();
-            cc.setPercentWidth(100.0 / COLS);
+            cc.setPercentWidth(A_HUNDRED_PERCENT / COLS);
             gridPane.getColumnConstraints().add(cc);
         });
 
-        IntStream.range(0, ROWS).forEach(i ->
+        IntStream.range(INTEGER_RANGE_ZERO, ROWS).forEach(i ->
         {
             final RowConstraints rc;
             rc = new RowConstraints();
-            rc.setPercentHeight(100.0 / ROWS);
+            rc.setPercentHeight(A_HUNDRED_PERCENT / ROWS);
             gridPane.getRowConstraints().add(rc);
         });
 
-        IntStream.range(0, ROWS).forEach(r ->
-                IntStream.range(0, COLS).forEach(c ->
+        IntStream.range(INTEGER_RANGE_ZERO, ROWS).forEach(r ->
+                IntStream.range(INTEGER_RANGE_ZERO, COLS).forEach(c ->
                 {
                     Button b = new Button("");
-                    b.setMinWidth(BUTTON_MIN_WIDTH);
-                    b.setMinHeight(BUTTON_MIN_HEIGHT);
+                    b.setMinWidth(BUTTON_MIN_WIDTH_IN_PIXELS);
+                    b.setMinHeight(BUTTON_MIN_HEIGHT_IN_PIXELS);
                     b.setOnAction(this);
                     gridPane.add(b, c, r);
                     buttons[r][c] = b;
@@ -118,16 +127,16 @@ public class NumberGame extends Application
         statusLabel = new Label("Status: Playing...");
 
         final VBox topBar;
-        topBar = new VBox(VBOX_WIDTH, nextNumberLabel, statusLabel);
+        topBar = new VBox(VBOX_WIDTH_IN_PIXELS, nextNumberLabel, statusLabel);
         final HBox bottomBar;
-        bottomBar = new HBox(HBOX_HEIGHT);
+        bottomBar = new HBox(HBOX_HEIGHT_IN_PIXELS);
 
         final VBox root;
-        root = new VBox(VBOX_WIDTH, topBar, gridPane, bottomBar);
+        root = new VBox(VBOX_WIDTH_IN_PIXELS, topBar, gridPane, bottomBar);
         root.setFillWidth(true);
 
         final Scene scene;
-        scene = new Scene(root, SCENE_WIDTH, SCENE_HEIGTH);
+        scene = new Scene(root, SCENE_WIDTH_IN_PIXELS, SCENE_HEIGTH_IN_PIXELS);
         scene.getStylesheets().add(
                 getClass().getResource("/styles.css").toExternalForm()
         );
@@ -222,7 +231,8 @@ public class NumberGame extends Application
      *     <li>Increments 'games played' in the scoreboard.</li>
      * </ul>
      */
-    public void resetGame() {
+    public void resetGame()
+    {
         // Clear the board array
         Arrays.fill(board, ZERO_VALUE);
 
@@ -263,8 +273,12 @@ public class NumberGame extends Application
         clicked = (Button) event.getSource();
 
         // Find row & column
-        int rowIndex = -1;
-        int colIndex = -1;
+        int rowIndex;
+        int colIndex;
+
+        rowIndex = ROW_INDEX_DEFAULT_VALUE;
+        colIndex = COLUMN_INDEX_DEFAULT_VALUE;
+
         outerLoop:
         for(int r = 0; r < ROWS; r++)
         {
@@ -279,7 +293,8 @@ public class NumberGame extends Application
             }
         }
 
-        int boardIndex = rowIndex * COLS + colIndex;
+        final int boardIndex;
+        boardIndex = rowIndex * COLS + colIndex;
         if(board[boardIndex] != ZERO_VALUE)
         {
             // Already has a number, ignore
@@ -346,7 +361,7 @@ public class NumberGame extends Application
      */
     private int getRandomNumber()
     {
-        return random.nextInt(NUMBER_UPPERBOUND) + 1;
+        return random.nextInt(NUMBER_UPPERBOUND) + RANDOM_NUMBER_ADJUSTMENT;
     }
 
     /*
@@ -367,10 +382,10 @@ public class NumberGame extends Application
     private boolean isBoardAscending(final int[] arr)
     {
         int[] nonZero = Arrays.stream(arr)
-                .filter(v -> v != 0)
+                .filter(v -> v != INTEGER_VALUE_ZERO)
                 .toArray();
-        return IntStream.range(1, nonZero.length)
-                .allMatch(i -> nonZero[i] > nonZero[i - 1]);
+        return IntStream.range(INTEGER_RANGE_ONE, nonZero.length)
+                .allMatch(i -> nonZero[i] > nonZero[i - RANGE_ADJUSTER_ONE]);
     }
 
     /*
@@ -382,9 +397,10 @@ public class NumberGame extends Application
      * @param arr the board array
      * @return true if there is at least one valid spot; false otherwise
      */
-    private boolean canPlaceNextNumber(final int n, final int[] arr)
+    private boolean canPlaceNextNumber(final int n,
+                                       final int[] arr)
     {
-        return IntStream.range(0, arr.length).anyMatch(i ->
+        return IntStream.range(INTEGER_RANGE_ZERO, arr.length).anyMatch(i ->
         {
             if(arr[i] == ZERO_VALUE)
             {

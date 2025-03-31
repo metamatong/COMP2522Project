@@ -120,7 +120,7 @@ class World
         }
 
         // Validate each key and Country entry in the map.
-        for (final Map.Entry<String, Country> entry : countries.entrySet())
+        for(final Map.Entry<String, Country> entry : countries.entrySet())
         {
             final String countryName = entry.getKey();
             final Country country = entry.getValue();

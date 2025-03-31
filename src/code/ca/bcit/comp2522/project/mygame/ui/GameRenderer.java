@@ -69,6 +69,7 @@ public class GameRenderer
      */
     public GameRenderer(final GameLogic gameLogic)
     {
+        validateGameLogic(gameLogic);
         this.gameLogic = gameLogic;
 
         try
@@ -676,5 +677,19 @@ public class GameRenderer
                       baseX,
                       baseY,
                       SPRITE_LOWER_BODY);
+    }
+
+    /*
+     * Validates that the provided GameLogic instance is not null.
+     *
+     * @param gameLogic the GameLogic instance to validate.
+     * @throws IllegalArgumentException if the provided gameLogic is null.
+     */
+    private static void validateGameLogic(final GameLogic gameLogic)
+    {
+        if(gameLogic == null)
+        {
+            throw new IllegalArgumentException("GameLogic instance cannot be null.");
+        }
     }
 }
