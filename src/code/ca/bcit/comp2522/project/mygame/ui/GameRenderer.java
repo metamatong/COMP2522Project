@@ -181,7 +181,7 @@ public class GameRenderer
         final double titleY;
         final double titleWidth;
         final double titleX;
-        final double offset;
+        double offset;
 
         titleY = logoY + logoHeight * CELL_SIZE_IN_PIXEL * INTRO_LOGO_CHARACTER_SIZE_WEIGHT + CELL_SIZE_IN_PIXEL;
         titleWidth = computeTextWidth(fullTitle, gc.getFont());
@@ -191,11 +191,12 @@ public class GameRenderer
         gc.fillText(titlePart1,
                     titleX,
                     titleY);
-        offset = computeTextWidth(titlePart1, gc.getFont()) + computeTextWidth(redWord, gc.getFont());
+        offset = computeTextWidth(titlePart1, gc.getFont());
         gc.setFill(Color.RED);
         gc.fillText(redWord,
                     titleX + offset,
                     titleY);
+        offset += computeTextWidth(redWord, gc.getFont());
         gc.setFill(Color.WHITE);
         gc.fillText(titlePart2,
                     titleX + offset,
