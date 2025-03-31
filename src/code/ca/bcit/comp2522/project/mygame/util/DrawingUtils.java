@@ -9,37 +9,109 @@ import static ca.bcit.comp2522.project.mygame.common.GameConfig.CANVAS_HEIGHT_IN
 import static ca.bcit.comp2522.project.mygame.common.GameConfig.CANVAS_WIDTH_IN_PIXEL;
 import static ca.bcit.comp2522.project.mygame.common.GameConfig.CELL_SIZE_IN_PIXEL;
 
+
+/**
+ * Provides utility methods for drawing text and handling movement direction conversions.
+ * <p>
+ * This class offers helper methods for computing text width, drawing strings safely within canvas bounds,
+ * and converting movement directions into coordinate deltas.
+ * </p>
+ * @author Kyle Cheon
+ * @version 1.0
+ */
 public class DrawingUtils
 {
-    public static double computeTextWidth(String text, Font font) {
-        Text tempText = new Text(text);
+    private static final int HALVING_FACTOR = 2;
+    private static final int BOUNDARY_ZERO = 0;
+    private static final int COORDINATE_MOVEMENT_BY_ZERO = 0;
+    private static final int COORDINATE_MOVEMENT_BY_NEGATIVE_ONE = -1;
+    private static final int COORDINATE_MOVEMENT_BY_POSITIVE_ONE = 1;
+
+    /**
+     * Computes the width of the specified text when rendered with the given font.
+     * <p>
+     * This method creates a temporary {@link Text} object with the provided text and font, then returns
+     * the width of its layout bounds.
+     * </p>
+     *
+     * @param text the text whose width is to be computed.
+     * @param font the font used to render the text.
+     * @return the width of the text in pixels.
+     */
+    public static double computeTextWidth(final String text,
+                                          final Font font)
+    {
+        final Text tempText;
+        tempText = new Text(text);
         tempText.setFont(font);
         return tempText.getLayoutBounds().getWidth();
     }
 
-    // Draws a string if within canvas bounds.
-    public static void putSafeString(GraphicsContext gc, double x, double y, String s) {
-        if (x + s.length() * CELL_SIZE_IN_PIXEL / 2 < 0 || x > CANVAS_WIDTH_IN_PIXEL) return;
-        if (y < 0 || y > CANVAS_HEIGHT_IN_PIXEL) return;
-        gc.fillText(s, x, y);
+    /**
+     * Draws a string on the given {@link GraphicsContext} only if the string's position is within the canvas bounds.
+     * <p>
+     * This method checks if the text drawn at position ({@code x}, {@code y}) with the length based on the
+     * {@code CELL_SIZE_IN_PIXEL} multiplied by half the length of the string does not exceed the canvas width or is
+     * below zero. If the text is outside the bounds, it is not drawn.
+     * </p>
+     *
+     * @param gc the GraphicsContext used for drawing.
+     * @param x  the x-coordinate at which to start drawing the text.
+     * @param y  the y-coordinate at which to draw the text.
+     * @param s  the string to be drawn.
+     */
+    public static void putSafeString(final GraphicsContext gc,
+                                     final double x,
+                                     final double y,
+                                     final String s)
+    {
+        if(x + s.length() * CELL_SIZE_IN_PIXEL / HALVING_FACTOR < BOUNDARY_ZERO || x > CANVAS_WIDTH_IN_PIXEL) return;
+        if(y < BOUNDARY_ZERO || y > CANVAS_HEIGHT_IN_PIXEL) return;
+        gc.fillText(s,
+                    x,
+                    y);
     }
 
 
-    // Helper: convert a Direction into an x delta.
-    public static int directionDeltaX(MovementDirection d) {
-        switch (d) {
-            case LEFT: return -1;
-            case RIGHT: return 1;
-            default: return 0;
+    /**
+     * Converts the specified movement direction into an x-axis delta.
+     * <p>
+     * For example, if the direction is {@link MovementDirection#LEFT}, this method returns -1.
+     * If the direction is {@link MovementDirection#RIGHT}, it returns 1.
+     * For other directions, it returns 0.
+     * </p>
+     *
+     * @param d the movement direction.
+     * @return the change in x-coordinate corresponding to the direction.
+     */
+    public static int directionDeltaX(final MovementDirection d)
+    {
+        switch(d)
+        {
+            case LEFT: return COORDINATE_MOVEMENT_BY_NEGATIVE_ONE;
+            case RIGHT: return COORDINATE_MOVEMENT_BY_POSITIVE_ONE;
+            default: return COORDINATE_MOVEMENT_BY_ZERO;
         }
     }
 
-    // Helper: convert a Direction into a y delta.
-    public static int directionDeltaY(MovementDirection d) {
-        switch (d) {
-            case UP: return -1;
-            case DOWN: return 1;
-            default: return 0;
+    /**
+     * Converts the specified movement direction into a y-axis delta.
+     * <p>
+     * For example, if the direction is {@link MovementDirection#UP}, this method returns -1.
+     * If the direction is {@link MovementDirection#DOWN}, it returns 1.
+     * For other directions, it returns 0.
+     * </p>
+     *
+     * @param d the movement direction.
+     * @return the change in y-coordinate corresponding to the direction.
+     */
+    public static int directionDeltaY(final MovementDirection d)
+    {
+        switch(d)
+        {
+            case UP: return COORDINATE_MOVEMENT_BY_NEGATIVE_ONE;
+            case DOWN: return COORDINATE_MOVEMENT_BY_POSITIVE_ONE;
+            default: return COORDINATE_MOVEMENT_BY_ZERO;
         }
     }
 }

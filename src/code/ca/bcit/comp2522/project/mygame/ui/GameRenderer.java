@@ -36,23 +36,23 @@ public class GameRenderer
 {
     private static final int COORDINATE_ZERO = 0;
     private static final int FIRST_INDEX = 0;
-    private static double INTRO_LOGO_CHARACTER_SIZE_WEIGHT = 0.75;
-    private static double GAME_STAT_CHARACTER_SIZE_WEIGHT = 0.6;
-    private static int LOGO_MIDDLE_FACTOR = 2;
+    private static final double INTRO_LOGO_CHARACTER_SIZE_WEIGHT = 0.75;
+    private static final double GAME_STAT_CHARACTER_SIZE_WEIGHT = 0.6;
+    private static final int LOGO_MIDDLE_FACTOR = 2;
     private static final double NANOSECOND_PER_SECOND = 1_000_000_000.0;
     private static final int INITIAL_COUNT = 0;
-    private static int GAME_STATS_OFFSET_IN_NUMBER_OF_CELLS = 5;
-    private static String FONT_STYLE = "Monospaced";
-    private static int FINISH_LINE_WIDTH_IN_PIXEL = 1;
-    private static double LIGHT_MACHINE_SIZE_WEIGHT = 0.6;
-    private static int SPRITE_OFFSET_ONE = 1;
-    private static int SPRITE_OFFSET_TWO = 2;
-    private static int SPRITE_OFFSET_THREE = 3;
-    private static int SPRITE_OFFSET_FOUR = 4;
-    private static String SPRITE_HEAD = " O ";
-    private static String SPRITE_UPPER_BODY = "/|\\";
-    private static String SPRITE_CORE_BODY = " | ";
-    private static String SPRITE_LOWER_BODY = "/ \\";
+    private static final int GAME_STATS_OFFSET_IN_NUMBER_OF_CELLS = 5;
+    private static final String FONT_STYLE = "Monospaced";
+    private static final int FINISH_LINE_WIDTH_IN_PIXEL = 1;
+    private static final double LIGHT_MACHINE_SIZE_WEIGHT = 0.6;
+    private static final int SPRITE_OFFSET_ONE = 1;
+    private static final int SPRITE_OFFSET_TWO = 2;
+    private static final int SPRITE_OFFSET_THREE = 3;
+    private static final int SPRITE_OFFSET_FOUR = 4;
+    private static final String SPRITE_HEAD = " O ";
+    private static final String SPRITE_UPPER_BODY = "/|\\";
+    private static final String SPRITE_CORE_BODY = " | ";
+    private static final String SPRITE_LOWER_BODY = "/ \\";
 
     private String[] logoLines;
     private String[] logoWinLines;
