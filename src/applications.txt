@@ -22,7 +22,7 @@ lesson 8:   file in DrawingUtils (logo.txt, winLogo.txt resources)
 
 lesson 9:   GUI in class MyGame and GameRenderer using JavaFX
 
-lesson 10:  TODO fill out this part
+lesson 10:  Verify player creation, movement (via tryMoveWithPush), light switching, win conditions, and red‐light elimination.
 
 lesson 11:  design pattern in class GameLogic (separation of concerns - MVC style)
 
