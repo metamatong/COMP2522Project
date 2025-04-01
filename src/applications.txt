@@ -1,0 +1,29 @@
+lesson 1:   initializers in class Player and GameLogic
+            overloading in constructor GameRenderer
+
+lesson 2:   inheritance in class MyGame (extends Application)
+            exceptions in class DrawingUtils
+
+lesson 3:   overriding in class MyGame (start, stop methods)
+            substitution in class GameRenderer (uses interface JavaFXGame)
+
+lesson 4:   interface JavaFXGame implemented by class MyGame
+            interface usage for GraphicsContext methods (e.g., fillText from interface)
+
+lesson 5:   collections in class GameLogic (List<Player>)
+            iterator in GameRenderer (looping through players)
+
+lesson 6:   lambda expressions in GameLogic (PauseTransition events)
+            method references in GameRenderer (DrawingUtils::putSafeString)
+            nested classes in anonymous inner class for AnimationTimer
+
+lesson 8:   file in DrawingUtils (logo.txt, winLogo.txt resources)
+            streams and filters in DrawingUtils (BufferedReader for InputStream)
+
+lesson 9:   GUI in class MyGame and GameRenderer using JavaFX
+
+lesson 10:  TODO fill out this part
+
+lesson 11:  design pattern in class GameLogic (separation of concerns - MVC style)
+
+lesson 12:  concurrency in class MyGame using AnimationTimer
