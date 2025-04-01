@@ -31,7 +31,7 @@ public class Score
     private int numCorrectSecondAttempts;
     private int numIncorrectTwoAttempts;
 
-    /*
+    /**
      * Constructs a Score object with the specified values.
      *
      * @param currentTime             the date and time when this score was recorded

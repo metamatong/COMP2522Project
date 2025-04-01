@@ -14,7 +14,7 @@ class Country
     private final String capitalCityName;
     private final String[] facts;
 
-    /*
+    /**
      * A constructor that instantiates Country object.
      *
      * @param name for name of the country
