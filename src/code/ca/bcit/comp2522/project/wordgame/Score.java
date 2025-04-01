@@ -117,19 +117,18 @@ public class Score
         final DateTimeFormatter formatter;
         formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
-        return String.format(
-                "Date and Time: %s\n" +
-                        "Games Played: %d\n" +
-                        "Correct First Attempts: %d\n" +
-                        "Correct Second Attempts: %d\n" +
-                        "Incorrect Attempts: %d\n" +
-                        "Score: %d points\n",
-                currentTime.format(formatter),
-                numGamesPlayed,
-                numCorrectFirstAttempts,
-                numCorrectSecondAttempts,
-                numIncorrectTwoAttempts,
-                getScore()
+        return String.format("Date and Time: %s\n" +
+                             "Games Played: %d\n" +
+                             "Correct First Attempts: %d\n" +
+                             "Correct Second Attempts: %d\n" +
+                             "Incorrect Attempts: %d\n" +
+                             "Score: %d points\n",
+                             currentTime.format(formatter),
+                             numGamesPlayed,
+                             numCorrectFirstAttempts,
+                             numCorrectSecondAttempts,
+                             numIncorrectTwoAttempts,
+                             getScore()
         );
     }
 
@@ -146,8 +145,11 @@ public class Score
     public static void appendScoreToFile(final Score score,
                                          final String scoreFilePath)
     {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-        String formattedDateTime = score.currentTime.format(formatter);
+        final DateTimeFormatter formatter;
+        final String formattedDateTime;
+
+        formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        formattedDateTime = score.currentTime.format(formatter);
 
         // Create a File object and ensure the file exists.
         final File file;
@@ -263,7 +265,6 @@ public class Score
         {
             e.printStackTrace();
         }
-
         return scoresList;
     }
 }
