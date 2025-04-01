@@ -21,48 +21,33 @@ public class ResourceLoader
     private static final int FIRST_INDEX = 0;
 
     /**
-     * Loads the logo resource from the "/logo.txt" file.
+     * Loads a text resource from the classpath and returns its content as an array of strings.
      * <p>
-     * This method reads the "/logo.txt" file from the classpath line by line and returns an array of strings,
-     * where each string represents a line of the logo.
+     * This method reads the specified resource file from the classpath line by line and returns an array of strings,
+     * where each string represents a line from the file. It can be used to load ASCII art logos or any other text-based resource.
+     * For example, to load the logo file, pass "/logo.txt", or to load the winning logo, pass "/winLogo.txt".
      * </p>
      *
-     * @return an array of strings representing the logo.
-     * @throws IOException if the logo resource is not found or an I/O error occurs during reading.
+     * @param resourcePath the path of the resource to load (e.g. "/logo.txt" or "/winLogo.txt")
+     * @return an array of strings representing the content of the resource.
+     * @throws IOException if the resource is not found or an I/O error occurs during reading.
      */
-    public static String[] loadLogo()
+    public static String[] loadResource(final String resourcePath)
             throws IOException
     {
-        final List<String> lines;
-        lines = new ArrayList<>();
-        try(final InputStream is = ResourceLoader.class.getResourceAsStream("/logo.txt");             BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-            if(is == null) throw new IOException("Logo resource not found!");
-            String line;
-            while((line = reader.readLine()) != null)
-            {
-                lines.add(line);
-            }
-        }
-        return lines.toArray(new String[FIRST_INDEX]);
-    }
+        final InputStream is;
+        is = ResourceLoader.class.getResourceAsStream(resourcePath);
 
-    /**
-     * Loads the winning logo resource from the "/winLogo.txt" file.
-     * <p>
-     * This method reads the "/winLogo.txt" file from the classpath line by line and returns an array of strings,
-     * where each string represents a line of the winning logo.
-     * </p>
-     *
-     * @return an array of strings representing the win logo.
-     * @throws IOException if the win logo resource is not found or an I/O error occurs during reading.
-     */
-    public static String[] loadWinLogo()
-            throws IOException
-    {
+        if(is == null)
+        {
+            throw new IOException("Resource not found: " + resourcePath);
+        }
+
         final List<String> lines;
         lines = new ArrayList<>();
-        try(final InputStream is = ResourceLoader.class.getResourceAsStream("/winLogo.txt");             BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-            if(is == null) throw new IOException("Logo resource not found!");
+
+        try(final BufferedReader reader = new BufferedReader(new InputStreamReader(is)))
+        {
             String line;
             while((line = reader.readLine()) != null)
             {

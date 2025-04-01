@@ -453,7 +453,7 @@ public class GameLogic
                 p.setY(newY);
             }
 
-            p.setLastMoveTIme(now);
+            p.setLastMoveTimestampInNanoseconds(now);
 
             return true;
         }
@@ -461,7 +461,7 @@ public class GameLogic
         {
             p.setX(newX);
             p.setY(newY);
-            p.setLastMoveTIme(now);
+            p.setLastMoveTimestampInNanoseconds(now);
             return true;
         }
     }

@@ -228,7 +228,7 @@ public class Player
      *
      * @param lastMoveTime the new last move time in nanoseconds.
      */
-    public void setLastMoveTIme(final long lastMoveTime)
+    public void setLastMoveTimestampInNanoseconds(final long lastMoveTime)
     {
         this.lastMoveTimestampInNanoseconds = lastMoveTime;
     }

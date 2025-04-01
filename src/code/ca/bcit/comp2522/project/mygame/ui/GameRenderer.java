@@ -74,7 +74,7 @@ public class GameRenderer
 
         try
         {
-            logoLines = ResourceLoader.loadLogo();
+            logoLines = ResourceLoader.loadResource("/logo.txt");
         }
         catch
         (final IOException e)
@@ -84,7 +84,7 @@ public class GameRenderer
 
         try
         {
-            logoWinLines = ResourceLoader.loadWinLogo();
+            logoWinLines = ResourceLoader.loadResource("/winLogo.txt");
         }
         catch
         (final IOException e)
