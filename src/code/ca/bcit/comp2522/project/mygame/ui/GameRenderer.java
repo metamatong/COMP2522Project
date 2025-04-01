@@ -3,7 +3,7 @@ package ca.bcit.comp2522.project.mygame.ui;
 import ca.bcit.comp2522.project.mygame.common.GameState;
 import ca.bcit.comp2522.project.mygame.engine.GameLogic;
 import ca.bcit.comp2522.project.mygame.entities.Player;
-import ca.bcit.comp2522.project.mygame.util.ResourceLoader;
+import ca.bcit.comp2522.project.mygame.util.DrawingUtils;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -62,7 +62,7 @@ public class GameRenderer
      * Constructs a new GameRenderer with the specified GameLogic instance.
      * <p>
      * This constructor attempts to load the logo assets for the intro and winning screens using
-     * the {@link ResourceLoader}. If the assets cannot be loaded, fallback default strings are used.
+     * the {@link DrawingUtils}. If the assets cannot be loaded, fallback default strings are used.
      * </p>
      *
      * @param gameLogic the GameLogic instance used to retrieve game state information.
@@ -74,7 +74,7 @@ public class GameRenderer
 
         try
         {
-            logoLines = ResourceLoader.loadResource("/logo.txt");
+            logoLines = DrawingUtils.loadResource("/logo.txt");
         }
         catch
         (final IOException e)
@@ -84,7 +84,7 @@ public class GameRenderer
 
         try
         {
-            logoWinLines = ResourceLoader.loadResource("/winLogo.txt");
+            logoWinLines = DrawingUtils.loadResource("/winLogo.txt");
         }
         catch
         (final IOException e)
