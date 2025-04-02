@@ -39,6 +39,8 @@ import static ca.bcit.comp2522.project.mygame.util.DrawingUtils.directionDeltaY;
  */
 public class GameLogic
 {
+    private static GameLogic singleGameLogic; // This variable stores single instance of GameLogic (Singleton pattern)
+
     private static final int FIRST_INDEX = 0;
     private static final int INITIAL_COUNT = 0;
     private static final boolean INITIAL_LIGHT_CONDITION = true;
@@ -72,15 +74,36 @@ public class GameLogic
     // Timestamp (in nanoseconds) of the last light switch.
     private long lastLightSwitchTimeInNanoseconds = 0;
 
-    /**
+    static
+    {
+        singleGameLogic = null;
+    }
+
+    /*
      * Constructs a new GameLogic instance with the specified SoundManager.
      *
      * @param soundManager the SoundManager used to play game sound effects.
      */
-    public GameLogic(final SoundManager soundManager)
+    private GameLogic(final SoundManager soundManager)
     {
         validateSoundManager(soundManager);
         this.soundManager = soundManager;
+    }
+
+    /**
+     * This is a method calling private constructor of GameLogic class
+     * to ensure there is only one instance of GameLogic object.
+     *
+     * @param soundManager
+     * @return
+     */
+    public static GameLogic getInstance(final SoundManager soundManager)
+    {
+        if(singleGameLogic == null)
+        {
+            singleGameLogic = new GameLogic(soundManager);
+        }
+        return singleGameLogic;
     }
 
     /**

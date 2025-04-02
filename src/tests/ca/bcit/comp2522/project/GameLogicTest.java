@@ -31,7 +31,7 @@ public class GameLogicTest {
     @Test
     void testInitGameCreatesPlayers() {
         SoundManager sm = new SoundManager();
-        GameLogic gl = new GameLogic(sm);
+        GameLogic gl = GameLogic.getInstance(sm);
         gl.initGame();
         List<Player> players = gl.getPlayers();
         assertNotNull(players, "initGame() should create a non-null list of players.");
@@ -44,7 +44,7 @@ public class GameLogicTest {
     @Test
     void testTryMoveWithPushMovesPlayer() {
         SoundManager sm = new SoundManager();
-        GameLogic gl = new GameLogic(sm);
+        GameLogic gl = GameLogic.getInstance(sm);
         gl.initGame();
         // Use the user-controlled player for movement testing.
         Player user = gl.getUser();
@@ -68,7 +68,7 @@ public class GameLogicTest {
     @Test
     void testLightSwitchTogglingViaUpdateGame() {
         SoundManager sm = new SoundManager();
-        GameLogic gl = new GameLogic(sm);
+        GameLogic gl = GameLogic.getInstance(sm);
         gl.initGame();
         // Capture the initial light state.
         boolean initialLight = gl.isGreen();
@@ -92,7 +92,7 @@ public class GameLogicTest {
     @Test
     void testUserWinCondition() {
         SoundManager sm = new SoundManager();
-        GameLogic gl = new GameLogic(sm);
+        GameLogic gl = GameLogic.getInstance(sm);
         gl.initGame();
         Player user = gl.getUser();
         // In GameConfig, FINISH_LINE_Y_IN_NUMBER_OF_CELLS is 5.
@@ -120,7 +120,7 @@ public class GameLogicTest {
     @Test
     void testGameRendererRenderDoesNotThrow() {
         SoundManager sm = new SoundManager();
-        GameLogic gl = new GameLogic(sm);
+        GameLogic gl = GameLogic.getInstance(sm);
         gl.initGame();
         GameRenderer renderer = new GameRenderer(gl);
         Canvas canvas = new Canvas(200, 200);

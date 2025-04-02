@@ -85,7 +85,7 @@ public class MyGame
     {
         this.myGameStage = primaryStage; // Store the stage for future reference.
         soundManager = new SoundManager();
-        gameLogic = new GameLogic(soundManager);
+        gameLogic = GameLogic.getInstance(soundManager);
         final GameRenderer renderer;
         renderer = new GameRenderer(gameLogic);
 
