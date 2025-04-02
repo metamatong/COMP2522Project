@@ -26,4 +26,4 @@ lesson 10:  Verify player creation, movement (via tryMoveWithPush), light switch
 
 lesson 11:  Singleton design pattern in class GameLogic (private constructor with getInstance method)
 
-lesson 12:  concurrency in class MyGame using AnimationTimer
+lesson 12:  concurrency in class MyGame using CountDownLatch and Platform.runLater()
