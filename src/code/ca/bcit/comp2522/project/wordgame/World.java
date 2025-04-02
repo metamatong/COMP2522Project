@@ -24,10 +24,9 @@ class World
 
     private final Map<String, Country> countries;
 
-    /*
+    /**
      * Constructs a World with the given countries.
      *
-     * @param countries the map of country names to Country objects
      * @throws IOException any error happened during reading a text file
      */
     World()

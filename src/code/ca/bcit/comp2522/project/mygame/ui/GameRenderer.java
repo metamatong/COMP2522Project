@@ -248,7 +248,8 @@ public class GameRenderer
                     STAT_HEIGHT_IN_PIXEL);
 
         // Prepare the stats string.
-        String stats = String.format("Time: %.1fs   Finished: %d   Dead: %d",
+        final String stats;
+        stats = String.format("Time: %.1fs   Finished: %d   Dead: %d",
                 elapsedSeconds, gameLogic.getFinishedCount(), deadCount);
 
         // Draw the stats at the top left (using a smaller font so it fits nicely).
