@@ -56,7 +56,7 @@ public class GameRenderer
 
     private String[] logoLines;
     private String[] logoWinLines;
-    private final GameLogic gameLogic;
+    private final GameLogic<Player> gameLogic;
 
     /**
      * Constructs a new GameRenderer with the specified GameLogic instance.
@@ -67,7 +67,7 @@ public class GameRenderer
      *
      * @param gameLogic the GameLogic instance used to retrieve game state information.
      */
-    public GameRenderer(final GameLogic gameLogic)
+    public GameRenderer(final GameLogic<Player> gameLogic)
     {
         validateGameLogic(gameLogic);
         this.gameLogic = gameLogic;

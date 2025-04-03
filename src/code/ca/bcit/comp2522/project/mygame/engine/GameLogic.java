@@ -37,9 +37,11 @@ import static ca.bcit.comp2522.project.mygame.util.DrawingUtils.directionDeltaY;
  * @author Kyle Cheon
  * @version 1.0
  */
-public class GameLogic
+public class GameLogic<T extends Player>
 {
-    private static GameLogic singleGameLogic; // This variable stores single instance of GameLogic (Singleton pattern)
+    private static GameLogic<?> singleGameLogic; // This variable stores single instance of GameLogic (Singleton pattern)
+    private List<T> players;
+    private T user;
 
     private static final int FIRST_INDEX = 0;
     private static final int INITIAL_COUNT = 0;
@@ -52,12 +54,8 @@ public class GameLogic
 
     private final SoundManager soundManager;
     private final Random random = new Random();
-    private Player user;
     private boolean gameOver = false;
     private long gameStartTimeInNanoseconds;
-
-    // List of all players in the game.
-    private List<Player> players;
 
     // Count of players who have successfully finished.
     private int finishedCount = 0;
@@ -97,13 +95,13 @@ public class GameLogic
      * @param soundManager
      * @return
      */
-    public static GameLogic getInstance(final SoundManager soundManager)
+    public static <T extends Player> GameLogic<T> getInstance(final SoundManager soundManager)
     {
         if(singleGameLogic == null)
         {
-            singleGameLogic = new GameLogic(soundManager);
+            singleGameLogic = new GameLogic<T>(soundManager);
         }
-        return singleGameLogic;
+        return (GameLogic<T>) singleGameLogic;
     }
 
     /**
@@ -111,20 +109,22 @@ public class GameLogic
      *
      * @return the list of players.
      */
-    public List<Player> getPlayers()
+    public List<T> getPlayers()
     {
         return players;
     }
+
 
     /**
      * Returns the user-controlled player.
      *
      * @return the user player.
      */
-    public Player getUser()
+    public T getUser()
     {
         return user;
     }
+
 
     /**
      * Returns the game start time in nanoseconds.
@@ -222,10 +222,10 @@ public class GameLogic
         for(int i = 0; i < NUMBER_OF_PLAYERS; i++)
         {
             final int startX;
-            final Player p;
+            final T p;
 
             startX = random.nextInt(GRID_WIDTH_IN_NUMBER_OF_CELLS);
-            p = new Player(startX, GRID_HEIGHT_IN_NUMBER_OF_CELLS - BOTTOM_OFFSET_IN_NUMBER_OF_CELLS);
+            p = (T) new Player(startX, GRID_HEIGHT_IN_NUMBER_OF_CELLS - BOTTOM_OFFSET_IN_NUMBER_OF_CELLS);
 
             if(i == FIRST_INDEX)
             {

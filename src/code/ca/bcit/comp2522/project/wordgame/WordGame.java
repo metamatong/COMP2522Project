@@ -361,9 +361,9 @@ public class WordGame
         {
             if(currentScore.getAverageScore() > previousHighestScore)
             {
-                System.out.println("CONGRATULATIONS! You are the new high score with an average of " +
+                System.out.println("CONGRATULATIONS!\nYou are the new high score with an average of " +
                         currentScore.getAverageScore() +
-                        " points per game; the previous record was " +
+                        " points per game;\n the previous record was " +
                         previousHighestScore +
                         " points per game on " +
                         formattedDate +
