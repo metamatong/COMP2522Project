@@ -1,5 +1,4 @@
-lesson 1:   initializers in class Player and GameLogic
-            overloading in constructor GameRenderer
+lesson 1:   overloading in constructor GameRenderer
 
 lesson 2:   inheritance in class MyGame (extends Application)
             exceptions in class DrawingUtils
@@ -13,16 +12,17 @@ lesson 4:   interface JavaFXGame implemented by class MyGame
 lesson 5:   collections in class GameLogic (List<Player>)
             iterator in GameRenderer (looping through players)
 
-lesson 6:   lambda expressions in GameLogic (PauseTransition events)
+lesson 6:   upper bound generics in GameLogic (GameLogic<T extends Player>)
+
+lesson 7:   lambda expressions in GameLogic (PauseTransition events)
             method references in GameRenderer (DrawingUtils::putSafeString)
-            nested classes in anonymous inner class for AnimationTimer
 
 lesson 8:   file in DrawingUtils (logo.txt, winLogo.txt resources)
             streams and filters in DrawingUtils (BufferedReader for InputStream)
 
 lesson 9:   GUI in class MyGame and GameRenderer using JavaFX
 
-lesson 10:  Verify player creation, movement (via tryMoveWithPush), light switching, win conditions, and red‐light elimination.
+lesson 10:  Verify player creation, movement, light switching etc.. (GameLogicTest)
 
 lesson 11:  Singleton design pattern in class GameLogic (private constructor with getInstance method)
 
