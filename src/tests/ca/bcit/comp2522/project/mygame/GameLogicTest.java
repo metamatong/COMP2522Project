@@ -1,4 +1,4 @@
-package ca.bcit.comp2522.project;
+package ca.bcit.comp2522.project.mygame;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -130,4 +130,39 @@ public class GameLogicTest {
         assertDoesNotThrow(() -> renderer.render(GameState.GAME, gc), "Rendering GAME screen should not throw an exception.");
         assertDoesNotThrow(() -> renderer.render(GameState.GAME_OVER, gc), "Rendering GAME_OVER screen should not throw an exception.");
     }
+
+    /**
+     * Positive test: Providing a valid SoundManager should return a non-null
+     * GameLogic instance (and not throw).
+     */
+    @Test
+    void testGetInstanceWithValidSoundManager() {
+        SoundManager sm = new SoundManager();
+        GameLogic<Player> gl = GameLogic.getInstance(sm);
+        assertNotNull(gl, "GameLogic instance should be created with a valid SoundManager.");
+    }
+
+    /**
+     * Negative test: Attempting to move again before the cooldown has elapsed
+     * should fail and return false.
+     */
+    @Test
+    void testTryMoveWithPushCooldownNotElapsed() {
+        SoundManager sm = new SoundManager();
+        GameLogic<Player> gl = GameLogic.getInstance(sm);
+        gl.initGame();
+
+        Player user = gl.getUser();
+        user.setX(10);
+        user.setY(10);
+
+        // First move should succeed.
+        boolean firstMove = gl.tryMoveWithPush(user, 0, -1, new ArrayList<>(), true);
+        assertTrue(firstMove, "First move within bounds should succeed.");
+
+        // Immediately try to move again; cooldown not elapsed => should fail.
+        boolean secondMove = gl.tryMoveWithPush(user, 0, -1, new ArrayList<>(), true);
+        assertFalse(secondMove, "Second move before cooldown ends should fail.");
+    }
+
 }

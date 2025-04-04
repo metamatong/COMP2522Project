@@ -22,7 +22,8 @@ lesson 8:   file in DrawingUtils (logo.txt, winLogo.txt resources)
 
 lesson 9:   GUI in class MyGame and GameRenderer using JavaFX
 
-lesson 10:  Verify player creation, movement, light switching etc.. (GameLogicTest)
+lesson 10:  Unit test for GameLogic class in GameLogicTest (in tests folder)
+            Positive and Negative test in GameLogicTest (testTryMoveWithPushCooldownNotElapsed etc.)
 
 lesson 11:  Singleton design pattern in class GameLogic (private constructor with getInstance method)
 
