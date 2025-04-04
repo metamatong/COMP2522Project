@@ -15,6 +15,9 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -49,7 +52,6 @@ public class NumberGame extends Application
     private static final double A_HUNDRED_PERCENT = 100.0;
     private static final int ROW_INDEX_DEFAULT_VALUE = -1;
     private static final int COLUMN_INDEX_DEFAULT_VALUE = -1;
-    private static final int RANDOM_NUMBER_ADJUSTMENT = 1;
     private static final int RANGE_ADJUSTER_ONE = 1;
     private Stage primaryStage;
 
@@ -69,6 +71,8 @@ public class NumberGame extends Application
     private int nextNumber;      // The next random number to place
     private int numbersPlaced;   // How many we've successfully placed so far
     private boolean gameOver;    // true if player has won or lost already
+    private List<Integer> availableNumbers;
+    private int nextNumberIndex;
 
     /**
      * Sets up and displays the JavaFX UI for the Number Game.
@@ -246,6 +250,15 @@ public class NumberGame extends Application
 
         statusLabel.setText("Status: Playing...");
 
+        // Initialize the list of available numbers
+        availableNumbers = new ArrayList<>();
+        for(int i = 1; i <= NUMBER_UPPERBOUND; i++)
+        {
+            availableNumbers.add(i);
+        }
+        Collections.shuffle(availableNumbers);
+        nextNumberIndex = INTEGER_VALUE_ZERO;
+
         // Start a new random number
         nextNumber = getRandomNumber();
         updateNextNumberLabel();
@@ -361,7 +374,14 @@ public class NumberGame extends Application
      */
     private int getRandomNumber()
     {
-        return random.nextInt(NUMBER_UPPERBOUND) + RANDOM_NUMBER_ADJUSTMENT;
+        if(nextNumberIndex < availableNumbers.size())
+        {
+            return availableNumbers.get(nextNumberIndex++);
+        }
+        else
+        {
+            return ZERO_VALUE;
+        }
     }
 
     /*
