@@ -107,7 +107,7 @@ public class MyGame
         scene = new Scene(root, CANVAS_WIDTH, CANVAS_HEIGHT);
         scene.getStylesheets().add(getClass().getResource("/myGameStyles.css").toExternalForm());
 
-        primaryStage.setTitle("Red Light Green Light");
+        primaryStage.setTitle("Red Light BLOOD Light");
         primaryStage.setScene(scene);
         primaryStage.show();
 
