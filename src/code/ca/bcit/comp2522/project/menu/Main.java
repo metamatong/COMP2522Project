@@ -123,7 +123,8 @@ public class Main extends Application
     private void launchGame(final JavaFXGame javaFXGame)
     {
         // Create a latch that waits for the game to finish.
-        CountDownLatch gameLatch = new CountDownLatch(LATCH_COUNT_DOWN);
+        final CountDownLatch gameLatch;
+        gameLatch = new CountDownLatch(LATCH_COUNT_DOWN);
 
         // Schedule the game’s play method on the JavaFX Application Thread.
         Platform.runLater(() -> javaFXGame.play(gameLatch));
