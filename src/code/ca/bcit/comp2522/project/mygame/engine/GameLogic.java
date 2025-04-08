@@ -383,7 +383,10 @@ public class GameLogic<T extends Player>
                     p.setEliminated(true);
                     p.setDeathTimeStamp(now);
                     playDeathSequence();
-                    if(p.isUser()) gameOver = true;
+                    if(p.isUser())
+                    {
+                        gameOver = true;
+                    }
                 }
             }
         }
