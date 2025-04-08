@@ -256,21 +256,23 @@ public class GameLogic<T extends Player>
     {
         // Create list of players and position them in a random place.
         players = new ArrayList<>();
-        for(int i = 0; i < NUMBER_OF_PLAYERS; i++)
+        for(int index = 0; index < NUMBER_OF_PLAYERS; index++)
         {
-            final int startX;
-            final T p;
+            final int startingXCoordinate;
+            final T newPlayer;
 
-            startX = random.nextInt(GRID_WIDTH_IN_NUMBER_OF_CELLS);
-            p = (T) new Player(startX, GRID_HEIGHT_IN_NUMBER_OF_CELLS - BOTTOM_OFFSET_IN_NUMBER_OF_CELLS);
+            startingXCoordinate = random.nextInt(GRID_WIDTH_IN_NUMBER_OF_CELLS);
+            newPlayer = (T) new Player(startingXCoordinate,
+                                    GRID_HEIGHT_IN_NUMBER_OF_CELLS - BOTTOM_OFFSET_IN_NUMBER_OF_CELLS);
 
-            if(i == FIRST_INDEX)
+            if(index == FIRST_INDEX)
             {
-                p.setUser(true);
-                user = p;
+                newPlayer.setUser(true);
+                user = newPlayer;
             }
-            players.add(p);
+            players.add(newPlayer);
         }
+
 
         // Record game starting time.
         gameStartTimeInNanoseconds = System.nanoTime();
@@ -357,11 +359,11 @@ public class GameLogic<T extends Player>
             {
                 if(!p.isEliminated() && !p.isUser() && random.nextDouble() < NPC_MOVING_IN_RED_LIGHT_PROBABILITY)
                 {
-                    final MovementDirection d;
-                    d = MovementDirection.values()[random.nextInt(NUMBER_OF_MOVEMENT_DIRECTIONS)];
+                    final MovementDirection direction;
+                    direction = MovementDirection.values()[random.nextInt(NUMBER_OF_MOVEMENT_DIRECTIONS)];
                     tryMoveWithPush(p,
-                                    directionDeltaX(d),
-                                    directionDeltaY(d),
+                                    directionDeltaX(direction),
+                                    directionDeltaY(direction),
                                     new ArrayList<>(),
                                     true);
                 }
@@ -462,19 +464,19 @@ public class GameLogic<T extends Player>
     }
 
     /**
-     * Attempts to move the given player by the specified delta (dx, dy), applying push logic if the target cell is
+     * Attempts to move the given player by the specified delta (deltaX, deltaY), applying push logic if the target cell is
      * occupied.
      * <p>
      * The method distinguishes between voluntary moves (initiated by the player) and forced moves (resulting from
      * cascading pushes):
      * <ul>
-     *   <li><b>Voluntary Moves:</b> If the move is initiated voluntarily (when {@code initiating} is {@code true})
+     *   <li><b>Voluntary Moves:</b> If the move is initiated voluntarily (when {@code voluntaryMove} is {@code true})
      *       and the target cell is occupied, the player does not move into the cell immediately; instead, it attempts
      *       to push the occupying player. If the user is initiating the move, a sound effect for pushing is triggered,
      *       and visual indicators (flags) are temporarily set for both the pusher and the pushed player to enable
      *       animation effects.</li>
      *   <li><b>Forced Moves:</b> When the move is not voluntary (i.e., as part of a push sequence with
-     *       {@code initiating} equal to {@code false}), the player is allowed to move into the target cell
+     *       {@code voluntaryMove} equal to {@code false}), the player is allowed to move into the target cell
      *       unconditionally after a successful recursive push of any occupant occupying that cell.</li>
      * </ul>
      * Additionally, the method enforces the following constraints:
@@ -482,53 +484,56 @@ public class GameLogic<T extends Player>
      *   <li><b>Move Cooldown:</b> The player can move only if the time elapsed since their last move exceeds a
      *       cooldown threshold defined by {@code MOVE_COOLDOWN_IN_NANOSECONDS}. This prevents excessively frequent
      *       moves.</li>
-     *   <li><b>Grid Boundaries:</b> The method ensures that the new position (after applying dx and dy) is within
+     *   <li><b>Grid Boundaries:</b> The method ensures that the new position (after applying deltaX and deltaY) is within
      *       the valid grid bounds, as defined by the game’s constants. If the move would result in a position outside
      *       these bounds, the move is rejected.</li>
      *   <li><b>Cyclic Push Prevention:</b> To avoid infinite recursion or cyclic pushing scenarios, a list of players
-     *       that have already been processed ({@code visited}) is maintained. If the current player is already present
+     *       that have already been processed ({@code visitedPlayers}) is maintained. If the current player is already present
      *       in this list, the push attempt is aborted.</li>
      * </ul>
      * </p>
      *
-     * @param p           the player to attempt moving.
-     * @param dx          the change in the x-coordinate.
-     * @param dy          the change in the y-coordinate.
-     * @param visited     a list of players already involved in the current push chain, used to prevent cyclic behavior.
-     * @param initiating  {@code true} if this move is initiated voluntarily by the player; {@code false} if it is forced as part of a push sequence.
+     * @param movingPlayer     the player to attempt moving.
+     * @param deltaX           the change in the x-coordinate.
+     * @param deltaY           the change in the y-coordinate.
+     * @param visitedPlayers   a list of players already involved in the current push chain, used to prevent cyclic behavior.
+     * @param voluntaryMove  {@code true} if this move is initiated voluntarily by the player; {@code false} if it is forced as part of a push sequence.
      * @return {@code true} if the move (or resulting push) was successfully executed; {@code false} if the move could not be completed.
      */
-    public boolean tryMoveWithPush(final Player p,
-                                   final int dx,
-                                   final int dy,
-                                   final List<Player> visited,
-                                   final boolean initiating)
+    public boolean tryMoveWithPush(final Player movingPlayer,
+                                   final int deltaX,
+                                   final int deltaY,
+                                   final List<Player> visitedPlayers,
+                                   final boolean voluntaryMove)
     {
-        final long now;
-        now = System.nanoTime();
+        final long currentTime;
+        currentTime = System.nanoTime();
 
         // Allow the move only if the cooldown has elapsed.
-        if(now - p.getLastMoveTimestampInNanoseconds() < MOVE_COOLDOWN_IN_NANOSECONDS)
+        if(currentTime - movingPlayer.getLastMoveTimestampInNanoseconds() < MOVE_COOLDOWN_IN_NANOSECONDS)
         {
             return false;
         }
 
-        // This line prevents players pushing each other endlessly
-        if(visited.contains(p)) return false;
+        // This line prevents players pushing each other endlessly.
+        if(visitedPlayers.contains(movingPlayer))
+        {
+            return false;
+        }
 
-        visited.add(p);
+        visitedPlayers.add(movingPlayer);
 
         final int newX;
         final int newY;
 
-        newX = p.getX() + dx;
-        newY = p.getY() + dy;
+        newX = movingPlayer.getX() + deltaX;
+        newY = movingPlayer.getY() + deltaY;
 
         // This makes sure the player does not move outside the game grid.
         if(newX < FIRST_INDEX ||
-           newX >= GRID_WIDTH_IN_NUMBER_OF_CELLS ||
-           newY < FIRST_INDEX ||
-           newY >= GRID_HEIGHT_IN_NUMBER_OF_CELLS)
+                newX >= GRID_WIDTH_IN_NUMBER_OF_CELLS ||
+                newY < FIRST_INDEX ||
+                newY >= GRID_HEIGHT_IN_NUMBER_OF_CELLS)
         {
             return false;
         }
@@ -538,52 +543,55 @@ public class GameLogic<T extends Player>
 
         if(occupant != null)
         {
-            if (initiating && p.isUser())
+            if(voluntaryMove && movingPlayer.isUser())
             {
                 soundManager.playPushSound();
                 // Set visual flags for pushing and pushed.
-                p.setPushing(true);
+                movingPlayer.setPushing(true);
                 occupant.setPushed(true);
                 // Reset these flags after a short delay.
-                final PauseTransition pt;
-                pt = new PauseTransition(Duration.millis(PUSHING_DELAY_IN_MILLISECOND));
-                pt.setOnFinished(e ->
+                final PauseTransition pushDelay;
+                pushDelay = new PauseTransition(Duration.millis(PUSHING_DELAY_IN_MILLISECOND));
+
+                pushDelay.setOnFinished(e ->
                 {
-                    p.setPushing(false);
+                    movingPlayer.setPushing(false);
                     occupant.setPushed(false);
                 });
-                pt.play();
+                pushDelay.play();
             }
-            final int oldX;
-            final int oldY;
+            final int previousX;
+            final int previousY;
 
-            oldX = p.getX();
-            oldY = p.getY();
+            previousX = movingPlayer.getX();
+            previousY = movingPlayer.getY();
 
             final boolean pushed;
-            pushed = tryMoveWithPush(occupant, dx, dy, visited, false);
-            if (!pushed) return false;
-
-            if (initiating)
+            pushed = tryMoveWithPush(occupant, deltaX, deltaY, visitedPlayers, false);
+            if(!pushed)
             {
-                p.setX(oldX);
-                p.setY(oldY);
+                return false;
+            }
+
+            if(voluntaryMove)
+            {
+                movingPlayer.setX(previousX);
+                movingPlayer.setY(previousY);
             }
             else
             {
-                p.setX(newX);
-                p.setY(newY);
+                movingPlayer.setX(newX);
+                movingPlayer.setY(newY);
             }
 
-            p.setLastMoveTimestampInNanoseconds(now);
-
+            movingPlayer.setLastMoveTimestampInNanoseconds(currentTime);
             return true;
         }
         else
         {
-            p.setX(newX);
-            p.setY(newY);
-            p.setLastMoveTimestampInNanoseconds(now);
+            movingPlayer.setX(newX);
+            movingPlayer.setY(newY);
+            movingPlayer.setLastMoveTimestampInNanoseconds(currentTime);
             return true;
         }
     }

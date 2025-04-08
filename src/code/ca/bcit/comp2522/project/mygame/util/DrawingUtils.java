@@ -56,28 +56,34 @@ public class DrawingUtils
     }
 
     /**
-     * Draws a string on the given {@link GraphicsContext} only if the string's position is within the canvas bounds.
+     * Draws a string on the given {@link GraphicsContext} only if the string'string position is within the canvas bounds.
      * <p>
      * This method checks if the text drawn at position ({@code x}, {@code y}) with the length based on the
      * {@code CELL_SIZE_IN_PIXEL} multiplied by half the length of the string does not exceed the canvas width or is
      * below zero. If the text is outside the bounds, it is not drawn.
      * </p>
      *
-     * @param gc the GraphicsContext used for drawing.
+     * @param graphicsContext the GraphicsContext used for drawing.
      * @param x  the x-coordinate at which to start drawing the text.
      * @param y  the y-coordinate at which to draw the text.
-     * @param s  the string to be drawn.
+     * @param string  the string to be drawn.
      */
-    public static void putSafeString(final GraphicsContext gc,
+    public static void putSafeString(final GraphicsContext graphicsContext,
                                      final double x,
                                      final double y,
-                                     final String s)
+                                     final String string)
     {
-        if(x + s.length() * CELL_SIZE_IN_PIXEL / HALVING_FACTOR < BOUNDARY_ZERO || x > CANVAS_WIDTH_IN_PIXEL) return;
-        if(y < BOUNDARY_ZERO || y > CANVAS_HEIGHT_IN_PIXEL) return;
-        gc.fillText(s,
-                    x,
-                    y);
+        if(x + string.length() * CELL_SIZE_IN_PIXEL / HALVING_FACTOR < BOUNDARY_ZERO || x > CANVAS_WIDTH_IN_PIXEL)
+        {
+            return;
+        }
+        if(y < BOUNDARY_ZERO || y > CANVAS_HEIGHT_IN_PIXEL)
+        {
+            return;
+        }
+        graphicsContext.fillText(string,
+                                 x,
+                                 y);
     }
 
 
@@ -89,12 +95,12 @@ public class DrawingUtils
      * For other directions, it returns 0.
      * </p>
      *
-     * @param d the movement direction.
+     * @param direction the movement direction.
      * @return the change in x-coordinate corresponding to the direction.
      */
-    public static int directionDeltaX(final MovementDirection d)
+    public static int directionDeltaX(final MovementDirection direction)
     {
-        switch(d)
+        switch(direction)
         {
             case LEFT: return COORDINATE_MOVEMENT_BY_NEGATIVE_ONE;
             case RIGHT: return COORDINATE_MOVEMENT_BY_POSITIVE_ONE;
@@ -110,12 +116,12 @@ public class DrawingUtils
      * For other directions, it returns 0.
      * </p>
      *
-     * @param d the movement direction.
+     * @param direction the movement direction.
      * @return the change in y-coordinate corresponding to the direction.
      */
-    public static int directionDeltaY(final MovementDirection d)
+    public static int directionDeltaY(final MovementDirection direction)
     {
-        switch(d)
+        switch(direction)
         {
             case UP: return COORDINATE_MOVEMENT_BY_NEGATIVE_ONE;
             case DOWN: return COORDINATE_MOVEMENT_BY_POSITIVE_ONE;
@@ -138,10 +144,10 @@ public class DrawingUtils
     public static String[] loadResource(final String resourcePath)
             throws IOException
     {
-        final InputStream is;
-        is = DrawingUtils.class.getResourceAsStream(resourcePath);
+        final InputStream inputStream;
+        inputStream = DrawingUtils.class.getResourceAsStream(resourcePath);
 
-        if(is == null)
+        if(inputStream == null)
         {
             throw new IOException("Resource not found: " + resourcePath);
         }
@@ -149,7 +155,7 @@ public class DrawingUtils
         final List<String> lines;
         lines = new ArrayList<>();
 
-        try(final BufferedReader reader = new BufferedReader(new InputStreamReader(is)))
+        try(final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream)))
         {
             String line;
             while((line = reader.readLine()) != null)

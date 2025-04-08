@@ -30,7 +30,8 @@ package ca.bcit.comp2522.project.mygame.common;
  * @author Kyle Cheon
  * @version 1.0
  */
-public enum MovementDirection {
+public enum MovementDirection
+{
 
     /**
      * Represents upward movement, typically toward the top of the display area.

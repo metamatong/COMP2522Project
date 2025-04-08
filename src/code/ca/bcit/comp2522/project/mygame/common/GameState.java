@@ -36,7 +36,8 @@ package ca.bcit.comp2522.project.mygame.common;
  * @author Kyle Cheon
  * @version 1.0
  */
-public enum GameState {
+public enum GameState
+{
     /**
      * Indicates that the introductory screen is shown.
      */

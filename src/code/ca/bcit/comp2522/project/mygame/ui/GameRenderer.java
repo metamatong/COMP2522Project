@@ -119,21 +119,21 @@ public class GameRenderer
      * </p>
      *
      * @param state the current game state.
-     * @param gc    the {@link GraphicsContext} used for performing drawing operations.
+     * @param graphicsContext    the {@link GraphicsContext} used for performing drawing operations.
      */
     public void render(final GameState state,
-                       final GraphicsContext gc)
+                       final GraphicsContext graphicsContext)
     {
         switch(state)
         {
             case INTRO:
-                drawIntroScreen(gc);
+                drawIntroScreen(graphicsContext);
                 break;
             case GAME:
-                drawGame(gc);
+                drawGame(graphicsContext);
                 break;
             case GAME_OVER:
-                drawGameOverScreen(gc);
+                drawGameOverScreen(graphicsContext);
                 break;
         }
     }
@@ -149,19 +149,19 @@ public class GameRenderer
      * </ul>
      * </p>
      *
-     * @param gc the {@link GraphicsContext} to use for drawing.
+     * @param graphicsContext the {@link GraphicsContext} to use for drawing.
      */
-    private void drawIntroScreen(final GraphicsContext gc)
+    private void drawIntroScreen(final GraphicsContext graphicsContext)
     {
-        gc.setFill(Color.BLACK);
-        gc.fillRect(COORDINATE_ZERO,
+        graphicsContext.setFill(Color.BLACK);
+        graphicsContext.fillRect(COORDINATE_ZERO,
                     COORDINATE_ZERO,
                     CANVAS_WIDTH_IN_PIXEL,
                     CANVAS_HEIGHT_IN_PIXEL);
-        gc.setFill(Color.WHITE);
+        graphicsContext.setFill(Color.WHITE);
 
         // Draw intro ASCII logo image.
-        gc.setFont(Font.font(FONT_STYLE, CELL_SIZE_IN_PIXEL * INTRO_LOGO_CHARACTER_SIZE_WEIGHT));
+        graphicsContext.setFont(Font.font(FONT_STYLE, CELL_SIZE_IN_PIXEL * INTRO_LOGO_CHARACTER_SIZE_WEIGHT));
 
         final int logoHeight;
         final double logoY;
@@ -177,15 +177,15 @@ public class GameRenderer
             final double textWidth;
             final double x;
             line = logoLines[i];
-            textWidth = computeTextWidth(line, gc.getFont());
+            textWidth = computeTextWidth(line, graphicsContext.getFont());
             x = (CANVAS_WIDTH_IN_PIXEL - textWidth) / LOGO_MIDDLE_FACTOR;
-            gc.fillText(line,
+            graphicsContext.fillText(line,
                         x,
                     logoY + i * CELL_SIZE_IN_PIXEL * INTRO_LOGO_CHARACTER_SIZE_WEIGHT);
         }
 
         // Construct title sentence.
-        gc.setFont(Font.font(FONT_STYLE, CELL_SIZE_IN_PIXEL)); // Back to original font size for title
+        graphicsContext.setFont(Font.font(FONT_STYLE, CELL_SIZE_IN_PIXEL)); // Back to original font size for title
         final String titlePart1;
         final String titlePart2;
         final String redWord;
@@ -202,21 +202,21 @@ public class GameRenderer
         double offset;
 
         titleY = logoY + logoHeight * CELL_SIZE_IN_PIXEL * INTRO_LOGO_CHARACTER_SIZE_WEIGHT + CELL_SIZE_IN_PIXEL;
-        titleWidth = computeTextWidth(fullTitle, gc.getFont());
+        titleWidth = computeTextWidth(fullTitle, graphicsContext.getFont());
         titleX = (CANVAS_WIDTH_IN_PIXEL - titleWidth) / LOGO_MIDDLE_FACTOR;
 
-        gc.setFill(Color.WHITE);
-        gc.fillText(titlePart1,
+        graphicsContext.setFill(Color.WHITE);
+        graphicsContext.fillText(titlePart1,
                     titleX,
                     titleY);
-        offset = computeTextWidth(titlePart1, gc.getFont());
-        gc.setFill(Color.RED);
-        gc.fillText(redWord,
+        offset = computeTextWidth(titlePart1, graphicsContext.getFont());
+        graphicsContext.setFill(Color.RED);
+        graphicsContext.fillText(redWord,
                     titleX + offset,
                     titleY);
-        offset += computeTextWidth(redWord, gc.getFont());
-        gc.setFill(Color.WHITE);
-        gc.fillText(titlePart2,
+        offset += computeTextWidth(redWord, graphicsContext.getFont());
+        graphicsContext.setFill(Color.WHITE);
+        graphicsContext.fillText(titlePart2,
                     titleX + offset,
                     titleY);
 
@@ -227,10 +227,10 @@ public class GameRenderer
         final double instrY;
 
         instructions = "Press ENTER to PLAY or ESC to EXIT";
-        instrWidth = computeTextWidth(instructions, gc.getFont());
+        instrWidth = computeTextWidth(instructions, graphicsContext.getFont());
         instrX = (CANVAS_WIDTH_IN_PIXEL - instrWidth) / LOGO_MIDDLE_FACTOR;
         instrY = titleY + CELL_SIZE_IN_PIXEL * LOGO_MIDDLE_FACTOR;
-        gc.fillText(instructions, instrX, instrY);
+        graphicsContext.fillText(instructions, instrX, instrY);
     }
 
     /*
@@ -242,9 +242,9 @@ public class GameRenderer
      * all players to display their active or eliminated sprites.
      * </p>
      *
-     * @param gc the {@link GraphicsContext} used for drawing the in-game screen.
+     * @param graphicsContext the {@link GraphicsContext} used for drawing the in-game screen.
      */
-    private void drawGame(final GraphicsContext gc)
+    private void drawGame(final GraphicsContext graphicsContext)
     {
         // Compute elapsed time in seconds.
         final double elapsedSeconds;
@@ -261,8 +261,8 @@ public class GameRenderer
         }
 
         // Clear previous stats
-        gc.setFill(Color.BLACK);
-        gc.fillRect(COORDINATE_ZERO,
+        graphicsContext.setFill(Color.BLACK);
+        graphicsContext.fillRect(COORDINATE_ZERO,
                     TOP_MARGIN_IN_PIXEL,
                     CANVAS_WIDTH_IN_PIXEL,
                     STAT_HEIGHT_IN_PIXEL);
@@ -273,29 +273,29 @@ public class GameRenderer
                 elapsedSeconds, gameLogic.getFinishedCount(), deadCount);
 
         // Draw the stats at the top left (using a smaller font so it fits nicely).
-        gc.setFill(Color.YELLOW);
-        gc.setFont(Font.font(FONT_STYLE,
+        graphicsContext.setFill(Color.YELLOW);
+        graphicsContext.setFont(Font.font(FONT_STYLE,
                 CELL_SIZE_IN_PIXEL * GAME_STAT_CHARACTER_SIZE_WEIGHT));
-        gc.fillText(stats,
+        graphicsContext.fillText(stats,
                 GAME_STATS_OFFSET_IN_NUMBER_OF_CELLS,
                 TOP_MARGIN_IN_PIXEL + CELL_SIZE_IN_PIXEL / LOGO_MIDDLE_FACTOR);
 
-        gc.setFill(Color.BLACK);
+        graphicsContext.setFill(Color.BLACK);
         // Clear only below the header area.
-        gc.fillRect(COORDINATE_ZERO,
+        graphicsContext.fillRect(COORDINATE_ZERO,
                 TOP_MARGIN_IN_PIXEL + STAT_HEIGHT_IN_PIXEL,
                 CANVAS_WIDTH_IN_PIXEL,
                 CANVAS_HEIGHT_IN_PIXEL - TOP_MARGIN_IN_PIXEL - STAT_HEIGHT_IN_PIXEL);
 
-        gc.setFont(Font.font(FONT_STYLE, CELL_SIZE_IN_PIXEL));
-        gc.setTextAlign(TextAlignment.LEFT);
+        graphicsContext.setFont(Font.font(FONT_STYLE, CELL_SIZE_IN_PIXEL));
+        graphicsContext.setTextAlign(TextAlignment.LEFT);
         if(!gameLogic.isGreen())
         {
-            drawLightMachine(gc);
+            drawLightMachine(graphicsContext);
         }
         else
         {
-            drawGreenMachine(gc);
+            drawGreenMachine(graphicsContext);
         }
 
         double finishLineYCanvas = FINISH_LINE_Y_IN_NUMBER_OF_CELLS * CELL_SIZE_IN_PIXEL +
@@ -303,11 +303,11 @@ public class GameRenderer
                                    STAT_HEIGHT_IN_PIXEL;
 
         // Set the stroke properties.
-        gc.setStroke(Color.DARKGREEN);
-        gc.setLineWidth(FINISH_LINE_WIDTH_IN_PIXEL);
+        graphicsContext.setStroke(Color.DARKGREEN);
+        graphicsContext.setLineWidth(FINISH_LINE_WIDTH_IN_PIXEL);
 
         // Draw a horizontal line across the canvas.
-        gc.strokeLine(COORDINATE_ZERO,
+        graphicsContext.strokeLine(COORDINATE_ZERO,
                       finishLineYCanvas,
                       CANVAS_WIDTH_IN_PIXEL,
                       finishLineYCanvas);
@@ -318,11 +318,11 @@ public class GameRenderer
             if (p.isFinished()) continue;
             if (p.isEliminated())
             {
-                drawDeadSprite(gc, p);
+                drawDeadSprite(graphicsContext, p);
             }
             else
             {
-                drawPlayerSprite(gc, p);
+                drawPlayerSprite(graphicsContext, p);
             }
         }
     }
@@ -336,30 +336,30 @@ public class GameRenderer
      * replaying or exiting the game.
      * </p>
      *
-     * @param gc the {@link GraphicsContext} used for drawing the game over screen.
+     * @param graphicsContext the {@link GraphicsContext} used for drawing the game over screen.
      */
-    private void drawGameOverScreen(final GraphicsContext gc)
+    private void drawGameOverScreen(final GraphicsContext graphicsContext)
     {
-        gc.setFill(Color.BLACK);
-        gc.fillRect(COORDINATE_ZERO,
+        graphicsContext.setFill(Color.BLACK);
+        graphicsContext.fillRect(COORDINATE_ZERO,
                     COORDINATE_ZERO,
                     CANVAS_WIDTH_IN_PIXEL,
                     CANVAS_HEIGHT_IN_PIXEL);
 
         if(gameLogic.getUser().isEliminated())
         {
-            gc.setFill(Color.WHITE);
-            gc.setFont(Font.font(FONT_STYLE, CELL_SIZE_IN_PIXEL));
+            graphicsContext.setFill(Color.WHITE);
+            graphicsContext.setFont(Font.font(FONT_STYLE, CELL_SIZE_IN_PIXEL));
             final String message;
             final double textWidth;
             final double centerX;
             final double centerY;
 
             message = "You die! Press ENTER to try again.";
-            textWidth = computeTextWidth(message, gc.getFont());
+            textWidth = computeTextWidth(message, graphicsContext.getFont());
             centerX = (CANVAS_WIDTH_IN_PIXEL - textWidth) / LOGO_MIDDLE_FACTOR;
             centerY = CANVAS_HEIGHT_IN_PIXEL / LOGO_MIDDLE_FACTOR;
-            gc.fillText(message,
+            graphicsContext.fillText(message,
                         centerX,
                         centerY);
         }
@@ -367,8 +367,8 @@ public class GameRenderer
         {
             // Winning screen
             // Draw the winning logo (similar to how drawIntroScreen does it)
-            gc.setFill(Color.WHITE);
-            gc.setFont(Font.font(FONT_STYLE,
+            graphicsContext.setFill(Color.WHITE);
+            graphicsContext.setFont(Font.font(FONT_STYLE,
                                 CELL_SIZE_IN_PIXEL * INTRO_LOGO_CHARACTER_SIZE_WEIGHT));
 
             final int logoHeight;
@@ -387,25 +387,25 @@ public class GameRenderer
                 final double x;
 
                 line = logoWinLines[i];
-                textWidth = computeTextWidth(line, gc.getFont());
+                textWidth = computeTextWidth(line, graphicsContext.getFont());
                 x = (CANVAS_WIDTH_IN_PIXEL - textWidth) / LOGO_MIDDLE_FACTOR;
-                gc.fillText(line,
+                graphicsContext.fillText(line,
                             x,
                         logoY + i * CELL_SIZE_IN_PIXEL * INTRO_LOGO_CHARACTER_SIZE_WEIGHT);
             }
 
             // Now show the “You win!” message below the logo
-            gc.setFont(Font.font(FONT_STYLE, CELL_SIZE_IN_PIXEL));
+            graphicsContext.setFont(Font.font(FONT_STYLE, CELL_SIZE_IN_PIXEL));
             final String message;
             final double messageWidth;
             final double messageX;
             final double messageY;
 
             message = "You win! But have you truly earned it after all these fallen fates?";
-            messageWidth = computeTextWidth(message, gc.getFont());
+            messageWidth = computeTextWidth(message, graphicsContext.getFont());
             messageX = (CANVAS_WIDTH_IN_PIXEL - messageWidth) / LOGO_MIDDLE_FACTOR;
             messageY = logoY + logoHeight * CELL_SIZE_IN_PIXEL * INTRO_LOGO_CHARACTER_SIZE_WEIGHT + CELL_SIZE_IN_PIXEL;
-            gc.fillText(message,
+            graphicsContext.fillText(message,
                         messageX,
                         messageY);
 
@@ -416,10 +416,10 @@ public class GameRenderer
             final double instrY;
 
             instructions = "Press ENTER to Play Again or ESC to Exit";
-            instrWidth = computeTextWidth(instructions, gc.getFont());
+            instrWidth = computeTextWidth(instructions, graphicsContext.getFont());
             instrX = (CANVAS_WIDTH_IN_PIXEL - instrWidth) / LOGO_MIDDLE_FACTOR;
             instrY = messageY + CELL_SIZE_IN_PIXEL * LOGO_MIDDLE_FACTOR;
-            gc.fillText(instructions,
+            graphicsContext.fillText(instructions,
                         instrX,
                         instrY);
         }
@@ -431,9 +431,9 @@ public class GameRenderer
      * This method draws a red-colored ASCII art doll representing the red light machine at a centered position.
      * </p>
      *
-     * @param gc the GraphicsContext used for drawing.
+     * @param graphicsContext the GraphicsContext used for drawing.
      */
-    private void drawLightMachine(final GraphicsContext gc)
+    private void drawLightMachine(final GraphicsContext graphicsContext)
     {
         final String[] doll =
         {
@@ -446,7 +446,7 @@ public class GameRenderer
                 "    \\|/     "
         };
 
-        gc.setFill(Color.RED);
+        graphicsContext.setFill(Color.RED);
 
         // Compute starting position to center the doll.
         final double dollWidth;
@@ -460,7 +460,7 @@ public class GameRenderer
         // Draw each line of the doll.
         for(int i = 0; i < doll.length; i++)
         {
-            putSafeString(gc,
+            putSafeString(graphicsContext,
                           startX,
                           startY + i * CELL_SIZE_IN_PIXEL,
                           doll[i]);
@@ -473,9 +473,9 @@ public class GameRenderer
      * This method draws a green-colored ASCII art doll representing the green light machine at a centered position.
      * </p>
      *
-     * @param gc the GraphicsContext used for drawing.
+     * @param graphicsContext the GraphicsContext used for drawing.
      */
-    private void drawGreenMachine(final GraphicsContext gc)
+    private void drawGreenMachine(final GraphicsContext graphicsContext)
     {
         String[] doll =
         {
@@ -488,7 +488,7 @@ public class GameRenderer
                 "    \\|/     "
         };
 
-        gc.setFill(Color.GREEN);
+        graphicsContext.setFill(Color.GREEN);
 
         // Compute starting position to center the doll.
         double dollWidth = doll[FIRST_INDEX].length() * (CELL_SIZE_IN_PIXEL * LIGHT_MACHINE_SIZE_WEIGHT);
@@ -498,7 +498,7 @@ public class GameRenderer
         // Draw each line of the doll.
         for(int i = 0; i < doll.length; i++)
         {
-            putSafeString(gc,
+            putSafeString(graphicsContext,
                           startX,
                           startY + i * CELL_SIZE_IN_PIXEL,
                           doll[i]);
@@ -511,25 +511,25 @@ public class GameRenderer
      * This method draws a representation of a dead player using gray color to indicate elimination.
      * </p>
      *
-     * @param gc the GraphicsContext used for drawing.
-     * @param p  the Player whose dead sprite is to be drawn.
+     * @param graphicsContext the GraphicsContext used for drawing.
+     * @param player  the Player whose dead sprite is to be drawn.
      */
-    private void drawDeadSprite(final GraphicsContext gc,
-                                final Player p)
+    private void drawDeadSprite(final GraphicsContext graphicsContext,
+                                final Player player)
     {
         final double baseX;
         final double baseY;
 
-        baseX = (p.getX() - SPRITE_OFFSET_ONE) * CELL_SIZE_IN_PIXEL;
-        baseY = p.getY() * CELL_SIZE_IN_PIXEL + TOP_MARGIN_IN_PIXEL + STAT_HEIGHT_IN_PIXEL;
+        baseX = (player.getX() - SPRITE_OFFSET_ONE) * CELL_SIZE_IN_PIXEL;
+        baseY = player.getY() * CELL_SIZE_IN_PIXEL + TOP_MARGIN_IN_PIXEL + STAT_HEIGHT_IN_PIXEL;
 
-        gc.setFill(Color.GRAY); // Use gray to indicate death.
+        graphicsContext.setFill(Color.GRAY); // Use gray to indicate death.
         // Draw a dead body.
-        putSafeString(gc,
+        putSafeString(graphicsContext,
                       baseX,
                       baseY - SPRITE_OFFSET_TWO * CELL_SIZE_IN_PIXEL,
                       "  ____");
-        putSafeString(gc,
+        putSafeString(graphicsContext,
                       baseX,
                       baseY - SPRITE_OFFSET_ONE * CELL_SIZE_IN_PIXEL,
                       "--O---");
@@ -543,55 +543,55 @@ public class GameRenderer
      * rendering is performed. Otherwise, a standard multi-line ASCII sprite is drawn.
      * </p>
      *
-     * @param gc the {@link GraphicsContext} used for drawing.
-     * @param p  the {@link Player} whose sprite is to be rendered.
+     * @param graphicsContext the {@link GraphicsContext} used for drawing.
+     * @param player  the {@link Player} whose sprite is to be rendered.
      */
-    private void drawPlayerSprite(final GraphicsContext gc,
-                                  final Player p)
+    private void drawPlayerSprite(final GraphicsContext graphicsContext,
+                                  final Player player)
     {
         final double baseX;
         final double baseY;
 
-        baseX = (p.getX() - SPRITE_OFFSET_ONE) * CELL_SIZE_IN_PIXEL;
-        baseY = p.getY() * CELL_SIZE_IN_PIXEL + TOP_MARGIN_IN_PIXEL + STAT_HEIGHT_IN_PIXEL;
+        baseX = (player.getX() - SPRITE_OFFSET_ONE) * CELL_SIZE_IN_PIXEL;
+        baseY = player.getY() * CELL_SIZE_IN_PIXEL + TOP_MARGIN_IN_PIXEL + STAT_HEIGHT_IN_PIXEL;
 
-        if(p.isUser())
+        if(player.isUser())
         {
-            gc.setFill(Color.CYAN);
-            if(p.isPushing())
+            graphicsContext.setFill(Color.CYAN);
+            if(player.isPushing())
             {
-                drawPushingSprite(gc,
-                                  p,
+                drawPushingSprite(graphicsContext,
+                                  player,
                                   baseX,
                                   baseY);
             }
             else if
-            (p.isPushed())
+            (player.isPushed())
             {
-                drawPushedSprite(gc,
-                                 p,
+                drawPushedSprite(graphicsContext,
+                                 player,
                                  baseX,
                                  baseY);
             }
             else
             {
-                putSafeString(gc,
+                putSafeString(graphicsContext,
                               baseX,
                               baseY - SPRITE_OFFSET_FOUR * CELL_SIZE_IN_PIXEL,
                               "YOU");
-                putSafeString(gc,
+                putSafeString(graphicsContext,
                               baseX,
                               baseY - SPRITE_OFFSET_THREE * CELL_SIZE_IN_PIXEL,
                               SPRITE_HEAD);
-                putSafeString(gc,
+                putSafeString(graphicsContext,
                               baseX,
                               baseY - SPRITE_OFFSET_TWO * CELL_SIZE_IN_PIXEL,
                               SPRITE_UPPER_BODY);
-                putSafeString(gc,
+                putSafeString(graphicsContext,
                               baseX,
                               baseY - SPRITE_OFFSET_ONE * CELL_SIZE_IN_PIXEL,
                               SPRITE_CORE_BODY);
-                putSafeString(gc,
+                putSafeString(graphicsContext,
                               baseX,
                               baseY,
                               SPRITE_LOWER_BODY);
@@ -599,30 +599,30 @@ public class GameRenderer
         }
         else
         {
-            gc.setFill(Color.WHITE);
+            graphicsContext.setFill(Color.WHITE);
             // For NPCs, you might only want to show a pushed sprite if they're being pushed.
-            if(p.isPushed())
+            if(player.isPushed())
             {
-                drawPushedSprite(gc,
-                                 p,
+                drawPushedSprite(graphicsContext,
+                                 player,
                                  baseX,
                                  baseY);
             }
             else
             {
-                putSafeString(gc,
+                putSafeString(graphicsContext,
                               baseX,
                               baseY - SPRITE_OFFSET_THREE * CELL_SIZE_IN_PIXEL,
                               SPRITE_HEAD);
-                putSafeString(gc,
+                putSafeString(graphicsContext,
                               baseX,
                               baseY - SPRITE_OFFSET_TWO * CELL_SIZE_IN_PIXEL,
                               SPRITE_UPPER_BODY);
-                putSafeString(gc,
+                putSafeString(graphicsContext,
                               baseX,
                               baseY - SPRITE_OFFSET_ONE * CELL_SIZE_IN_PIXEL,
                               SPRITE_CORE_BODY);
-                putSafeString(gc,
+                putSafeString(graphicsContext,
                               baseX,
                               baseY,
                               SPRITE_LOWER_BODY);
@@ -636,34 +636,34 @@ public class GameRenderer
      * This method renders a modified sprite to indicate that the player is pushing.
      * </p>
      *
-     * @param gc    the GraphicsContext used for drawing.
-     * @param p     the Player who is pushing.
+     * @param graphicsContext    the GraphicsContext used for drawing.
+     * @param player     the Player who is pushing.
      * @param baseX the base x-coordinate for the sprite.
      * @param baseY the base y-coordinate for the sprite.
      */
-    private void drawPushingSprite(final GraphicsContext gc,
-                                   final Player p,
+    private void drawPushingSprite(final GraphicsContext graphicsContext,
+                                   final Player player,
                                    final double baseX,
                                    final double baseY)
     {
-        gc.setFill(p.isUser() ? Color.CYAN : Color.WHITE);
-        putSafeString(gc,
+        graphicsContext.setFill(player.isUser() ? Color.CYAN : Color.WHITE);
+        putSafeString(graphicsContext,
                       baseX,
                       baseY - 4 * CELL_SIZE_IN_PIXEL,
-                      p.isUser() ? "YOU" : "");
-        putSafeString(gc,
+                      player.isUser() ? "YOU" : "");
+        putSafeString(graphicsContext,
                       baseX,
                       baseY - SPRITE_OFFSET_THREE * CELL_SIZE_IN_PIXEL,
                       SPRITE_HEAD);
-        putSafeString(gc,
+        putSafeString(graphicsContext,
                       baseX,
                       baseY - SPRITE_OFFSET_TWO * CELL_SIZE_IN_PIXEL,
                       "-|\\"); // Note the extra dash on the left to suggest pushing.
-        putSafeString(gc,
+        putSafeString(graphicsContext,
                       baseX,
                       baseY - SPRITE_OFFSET_ONE * CELL_SIZE_IN_PIXEL,
                       SPRITE_CORE_BODY);
-        putSafeString(gc,
+        putSafeString(graphicsContext,
                       baseX,
                       baseY,
                       SPRITE_LOWER_BODY);
