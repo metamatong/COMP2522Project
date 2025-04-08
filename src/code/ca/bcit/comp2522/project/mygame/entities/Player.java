@@ -33,8 +33,8 @@ public class Player
     private int y;
     private int prevX;
     private int prevY;
-    private boolean isUser;
-    private boolean isEliminated;
+    private boolean user;
+    private boolean eliminated;
     private boolean finished; // This indicates whether the player finished the game by reaching finish line.
     private boolean pushing = false;  // This indicates that this player is currently pushing.
     private boolean pushed = false;   // This indicates that this player is currently being pushed down.
@@ -64,8 +64,8 @@ public class Player
         this.y = y;
         this.prevX = x;
         this.prevY = y;
-        this.isUser = false;
-        this.isEliminated = false;
+        this.user = false;
+        this.eliminated = false;
         this.finished = false;
     }
 
@@ -156,7 +156,7 @@ public class Player
      */
     public boolean isUser()
     {
-        return isUser;
+        return user;
     }
 
     /**
@@ -166,7 +166,7 @@ public class Player
      */
     public boolean isEliminated()
     {
-        return isEliminated;
+        return eliminated;
     }
 
     /**
@@ -222,21 +222,21 @@ public class Player
     /**
      * Sets whether the player is currently pushing.
      *
-     * @param isPushing {@code true} if the player is pushing; {@code false} otherwise.
+     * @param pushing {@code true} if the player is pushing; {@code false} otherwise.
      */
-    public void setPushing(final boolean isPushing)
+    public void setPushing(final boolean pushing)
     {
-        this.pushing = isPushing;
+        this.pushing = pushing;
     }
 
     /**
      * Sets whether the player is currently being pushed.
      *
-     * @param isPushed {@code true} if the player is being pushed; {@code false} otherwise.
+     * @param pushed {@code true} if the player is being pushed; {@code false} otherwise.
      */
-    public void setPushed(final boolean isPushed)
+    public void setPushed(final boolean pushed)
     {
-        this.pushed = isPushed;
+        this.pushed = pushed;
     }
 
     /**
@@ -262,31 +262,31 @@ public class Player
     /**
      * Sets whether this player is controlled by the user.
      *
-     * @param isUser {@code true} if the player is the user; {@code false} otherwise.
+     * @param user {@code true} if the player is the user; {@code false} otherwise.
      */
-    public void setUser(final boolean isUser)
+    public void setUser(final boolean user)
     {
-        this.isUser = isUser;
+        this.user = user;
     }
 
     /**
      * Sets the eliminated status of the player.
      *
-     * @param isEliminated {@code true} if the player should be marked as eliminated; {@code false} otherwise.
+     * @param eliminated {@code true} if the player should be marked as eliminated; {@code false} otherwise.
      */
-    public void setEliminated(final boolean isEliminated)
+    public void setEliminated(final boolean eliminated)
     {
-        this.isEliminated = isEliminated;
+        this.eliminated = eliminated;
     }
 
     /**
      * Sets the finished status of the player.
      *
-     * @param isFinished {@code true} if the player has finished the game; {@code false} otherwise.
+     * @param finished {@code true} if the player has finished the game; {@code false} otherwise.
      */
-    public void setFinished(final boolean isFinished)
+    public void setFinished(final boolean finished)
     {
-        this.finished = isFinished;
+        this.finished = finished;
     }
 
     /*

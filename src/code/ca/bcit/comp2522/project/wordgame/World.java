@@ -133,13 +133,13 @@ class World
      */
     private static void validateCountries(final HashMap<String, Country> countries)
     {
-        final boolean countriesIsNull;
-        final boolean countriesIsEmpty;
+        final boolean countriesNull;
+        final boolean countriesEmpty;
 
-        countriesIsNull = countries == null;
-        countriesIsEmpty = countries != null && countries.isEmpty();
+        countriesNull = countries == null;
+        countriesEmpty = countries != null && countries.isEmpty();
 
-        if(countriesIsNull || countriesIsEmpty)
+        if(countriesNull || countriesEmpty)
         {
             throw new IllegalArgumentException("Empty or null countries map cannot be used.");
         }
@@ -151,13 +151,13 @@ class World
             final Country country = entry.getValue();
 
             // Validate the country name
-            final boolean nameIsNull;
-            final boolean nameIsEmpty;
+            final boolean nameNull;
+            final boolean nameEmpty;
 
-            nameIsNull = countryName == null;
-            nameIsEmpty = countryName != null && countryName.isEmpty();
+            nameNull = countryName == null;
+            nameEmpty = countryName != null && countryName.isEmpty();
 
-            if(nameIsNull || nameIsEmpty)
+            if(nameNull || nameEmpty)
             {
                 throw new IllegalArgumentException("Empty or null country name cannot be used in the map.");
             }

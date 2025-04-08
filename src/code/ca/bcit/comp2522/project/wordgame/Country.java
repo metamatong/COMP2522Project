@@ -86,14 +86,14 @@ class Country
      */
     private static void validateNames(final String name)
     {
-        final boolean nameIsNull;
-        final boolean nameIsEmpty;
+        final boolean nameNull;
+        final boolean nameEmpty;
 
-        nameIsNull = name == null;
-        nameIsEmpty = name != null && name.isEmpty();
+        nameNull = name == null;
+        nameEmpty = name != null && name.isEmpty();
 
 
-        if(nameIsNull || nameIsEmpty)
+        if(nameNull || nameEmpty)
         {
             throw new IllegalArgumentException("Empty or null name cannot be used.");
         }
@@ -111,13 +111,13 @@ class Country
      */
     private static void validateFacts(final String[] facts)
     {
-        final boolean factsIsNull;
-        final boolean factsIsEmpty;
+        final boolean factsNull;
+        final boolean factsEmpty;
 
-        factsIsNull = facts == null;
-        factsIsEmpty = facts != null && facts.length == ZERO_VALUE;
+        factsNull = facts == null;
+        factsEmpty = facts != null && facts.length == ZERO_VALUE;
 
-        if(factsIsNull || factsIsEmpty)
+        if(factsNull || factsEmpty)
         {
             throw new IllegalArgumentException("Empty or null fact array cannot be used.");
         }
