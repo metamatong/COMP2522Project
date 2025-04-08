@@ -10,10 +10,22 @@ import java.time.format.DateTimeFormatter;
 
 
 /**
- * The class that implements a word-based game that tests the user's knowledge
- * of countries, their capitals, and related facts.
- * The game continues for a set number of questions per session and then prompts the user to play again.
- * Scores are saved to a file after the user decides to quit.
+ * Implements a word-based game that tests the user's knowledge of countries, their capitals, and related facts.
+ * <p>
+ * In this game, the user is presented with a series of questions (typically 10 per session) based on one of three game
+ * types:
+ * <ul>
+ *   <li><b>Capital to Country:</b> The question provides a capital city and the user must respond with the correct
+ *   country.</li>
+ *   <li><b>Country to Capital:</b> The question provides a country name and the user must identify its capital.</li>
+ *   <li><b>Fact to Country:</b> The question presents a fact about a country, and the user answers with the country's
+ *   name.</li>
+ * </ul>
+ * After each set of questions, the session statistics are displayed (including counts for correct answers on the first
+ * or second attempt and incorrect attempts) and the user is prompted to play again. When the user quits, the session's
+ * score is saved to a file.
+ * </p>
+ *
  * @author Kyle Cheon
  * @version 1.0
  */
@@ -30,7 +42,12 @@ public class WordGame
     private int thirdAttemptNumber = 0;
 
     /**
-     * Constructs a new WordGame and initializes the game world and score list.
+     * Constructs a new {@code WordGame} and initializes the game world.
+     * <p>
+     * The constructor creates a new {@link World} object that encapsulates all available country data,
+     * including country names, capital cities, and related facts. This world is used throughout the game to
+     * retrieve random questions.
+     * </p>
      */
     public WordGame()
     {
@@ -42,10 +59,16 @@ public class WordGame
     /**
      * Starts the word game session.
      * <p>
-     * The method repeatedly asks a set number of questions to the user,
-     * checks their answers, and displays the current score tally.
-     * Once the session is over, the user is prompted whether to play again.
-     * If the user chooses not to continue, scores are saved to file.
+     * This method initiates the game loop, which repeatedly asks a fixed number of questions (as defined by
+     * {@code NUMBER_OF_QUESTIONS}). For each question, the method:
+     * <ul>
+     *   <li>Fetches a question/answer pair based on a randomly selected game type.</li>
+     *   <li>Prompts the user to input their answer, first attempting to answer correctly.</li>
+     *   <li>If the first attempt is incorrect, the user is given a second attempt; if this is also incorrect,
+     *       the correct answer is displayed and the incorrect counter is incremented.</li>
+     * </ul>
+     * After processing all questions, the game session statistics are displayed, and the user is prompted to
+     * play again. If the user opts to stop playing, the session score is saved to a file.
      * </p>
      */
     public void playWordGame()
@@ -137,12 +160,20 @@ public class WordGame
     /*
      * Retrieves a random question and its corresponding answer.
      * <p>
-     * This method randomly selects a game type from the WordGameType enum and
-     * delegates to the appropriate method to fetch the question/answer pair.
+     * This helper method selects a random game type from the {@code WordGameType} enum and delegates
+     * to the appropriate method to fetch a question/answer pair. The game types include:
+     * <ul>
+     *   <li><b>Capital to Country</b>: Uses the capital city as the prompt and expects the country name as the answer.
+     * </li>
+     *   <li><b>Country to Capital</b>: Uses the country name as the prompt and expects the capital city as the answer.
+     * </li>
+     *   <li><b>Fact to Country</b>: Uses a factual statement about a country as the prompt and expects the country
+     *   name as the answer.</li>
+     * </ul>
      * </p>
      *
      * @return a String array where the first element is the question and the second element is the answer,
-     *         or null if no valid question is available.
+     *         or {@code null} if no valid question can be generated.
      */
     private String[] getWordGameQuestionAndAnswer()
     {
@@ -187,13 +218,14 @@ public class WordGame
     }
 
     /*
-     * Fetches a question and answer pair for the "Capital to Country" game type.
+     * Fetches a question/answer pair for the "Capital to Country" game type.
      * <p>
-     * The question is the capital city name, and the answer is the corresponding country name.
+     * In this game type, the prompt is the capital city name and the answer is the corresponding country name.
+     * A random country is selected from the game world for this purpose.
      * </p>
      *
-     * @return a String array where the first element is the capital city (question) and the
-     *         second element is the country name (answer).
+     * @return a String array where the first element is the capital city (question) and the second element is the
+     * country name (answer).
      */
     private String[] fetchCapitalQuestionAndAnswer()
     {
@@ -218,13 +250,14 @@ public class WordGame
     }
 
     /*
-     * Fetches a question and answer pair for the "Country to Capital" game type.
+     * Fetches a question/answer pair for the "Country to Capital" game type.
      * <p>
-     * The question is the country name, and the answer is the corresponding capital city.
+     * In this game type, the prompt is the country name and the answer is its corresponding capital city.
+     * A random country is selected from the game world to generate the question.
      * </p>
      *
-     * @return a String array where the first element is the country name (question) and the
-     *         second element is the capital city name (answer).
+     * @return a String array where the first element is the country name (question) and the second element is the
+     * capital city (answer).
      */
     private String[] fetchCountryQuestionAndAnswer()
     {
@@ -249,13 +282,14 @@ public class WordGame
     }
 
     /*
-     * Fetches a question and answer pair for the "Fact to Country" game type.
+     * Fetches a question/answer pair for the "Fact to Country" game type.
      * <p>
-     * The question is a fact about a country, and the answer is the country's name.
+     * In this game type, the prompt is a randomly selected fact about a country,
+     * and the answer is the name of that country. A random country and a random fact about that country are chosen.
      * </p>
      *
-     * @return a String array where the first element is a fact (question) and the second element is the
-     *         country name (answer).
+     * @return a String array where the first element is a fact (the question) and the second element is the country
+     * name (the answer).
      */
     private String[] fetchFactQuestionAndAnswer()
     {
@@ -283,11 +317,11 @@ public class WordGame
 
 
     /*
-     * Saves the current game scores to a file.
+     * Saves the current game session's scores to a file.
      * <p>
-     * This method writes the game details, including the date/time, number of questions played,
-     * correct and incorrect answers, and total score to a designated file. It then determines
-     * the previous high score and delegates reporting to reportScores(Score, int, LocalDateTime).
+     * This method creates a {@link Score} object using the current game statistics and the current date/time.
+     * It then reads previously stored scores to determine the current high score and reports the scores via a
+     * dedicated method. Finally, it appends the current score to the score file for persistent storage.
      * </p>
      */
     private void saveScoresToFile()
@@ -333,10 +367,19 @@ public class WordGame
     }
 
     /*
-     * Reports the current game session's score and the high score details to the user.
+     * Reports the current game session's score and the previous high score details to the user.
+     * <p>
+     * This method formats the previous high score date and time using specific patterns and then prints a message:
+     * <ul>
+     *   <li>If the current session is the player's first game (score of 0), a first-time message is shown.</li>
+     *   <li>If the current session's average score is higher than the previous high score, a congratulatory message
+     *   is displayed.</li>
+     *   <li>Otherwise, the user is informed that they did not beat the high score.</li>
+     * </ul>
+     * </p>
      *
-     * @param currentScore the score of the current game session.
-     * @param previousHighestScore the previous highest average score.
+     * @param currentScore           the {@link Score} object of the current game session.
+     * @param previousHighestScore   the previous highest average score.
      * @param previousHighestScoreTime the date and time when the previous high score was achieved.
      */
     private void reportScores(final Score currentScore,

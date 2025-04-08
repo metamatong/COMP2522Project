@@ -1,12 +1,29 @@
 package ca.bcit.comp2522.project.mygame.entities;
 
 /**
- * Represents a player entity in the game.
+ * The {@code Player} class represents an individual participant within the game,
+ * whether controlled by the user or managed by game logic for non-player characters (NPCs).
  * <p>
- * This class maintains the player's current and previous positions, status flags, and timestamps for movement
- * and elimination. It provides getter and setter methods to access and modify the player's state, including whether
- * the player is controlled by the user, eliminated, has finished, is pushing, or is being pushed.
+ * Each player maintains its current position and a record of its previous position,
+ * which is critical for determining movement deltas and validating moves. In addition,
+ * the class tracks several state flags that indicate if the player is controlled by the user,
+ * whether the player has been eliminated, whether it has successfully finished the game,
+ * and flags used during push interactions (i.e., if the player is pushing or being pushed).
+ * The class also records timestamps (in nanoseconds) for when the player last moved as well as
+ * when it was eliminated, aiding in enforcing cooldowns and determining the order of events.
  * </p>
+ * <p>
+ * This class is designed for grid-based gameplay environments where valid coordinates must be non-negative.
+ * To ensure robustness, the constructor validates that the provided initial coordinates meet this requirement.
+ * Once constructed, a {@code Player} is initialized with the following default state:
+ * <ul>
+ *   <li>The current and previous coordinates are set to the provided starting values.</li>
+ *   <li>The player is not flagged as a user-controlled player.</li>
+ *   <li>The player is not eliminated and is considered active in the game.</li>
+ *   <li>No movement or push interactions have yet taken place.</li>
+ * </ul>
+ * </p>
+ *
  * @author Kyle Cheon
  * @version 1.0
  */
@@ -25,10 +42,19 @@ public class Player
     private long lastMoveTimestampInNanoseconds = 0;
 
     /**
-     * Constructs a new player with the specified starting position.
+     * Constructs a new {@code Player} with the specified starting coordinates.
+     * <p>
+     * The coordinates ({@code x}, {@code y}) represent the initial position of the player within the game grid.
+     * This constructor validates that both coordinates are non-negative by invoking an internal helper method.
+     * Upon successful validation, the player's current and previous positions are initialized to these values.
+     * Moreover, the player's control and status flags (including {@code isUser}, {@code isEliminated}, and
+     * {@code finished}) are initialized to {@code false}, indicating that the player is active and has not yet been
+     * assigned a specialized role.
+     * </p>
      *
-     * @param x the starting x-coordinate of the player.
-     * @param y the starting y-coordinate of the player.
+     * @param x the starting x-coordinate of the player; must be a non-negative integer.
+     * @param y the starting y-coordinate of the player; must be a non-negative integer.
+     * @throws IllegalArgumentException if either {@code x} or {@code y} is negative.
      */
     public Player(final int x,
                   final int y)

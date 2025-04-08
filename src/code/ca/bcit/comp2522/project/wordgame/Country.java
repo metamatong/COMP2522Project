@@ -1,7 +1,12 @@
 package ca.bcit.comp2522.project.wordgame;
 
 /**
- * A class that represents country information used in the game.
+ * Represents country-specific information for use in the word game.
+ * <p>
+ * This class encapsulates the details of a country, including its name, the name of its capital city,
+ * and an array of interesting facts about the country. Instances of this class are intended to be used as
+ * data objects for game questions, trivia, or other country-related content.
+ * </p>
  *
  * @author Kyle Cheon
  * @version 1.0
@@ -15,11 +20,16 @@ class Country
     private final String[] facts;
 
     /**
-     * A constructor that instantiates Country object.
+     * Constructs a {@code Country} object with the specified name, capital city, and facts.
+     * <p>
+     * The constructor validates each parameter to ensure that the country name, capital city name, and facts
+     * array are neither {@code null} nor empty. If any validation fails, an {@code IllegalArgumentException} is thrown.
+     * </p>
      *
-     * @param name for name of the country
-     * @param capitalCityName for name of the capital city of the given country
-     * @param facts for simple facts about the given country
+     * @param name             the name of the country; must not be null or empty.
+     * @param capitalCityName  the name of the capital city; must not be null or empty.
+     * @param facts            an array of interesting facts about the country; must not be null or empty.
+     * @throws IllegalArgumentException if any input parameter is null or empty.
      */
     Country(final String name,
             final String capitalCityName,
@@ -65,8 +75,14 @@ class Country
     }
 
     /*
-     * validates String names used in Country class in the constructor.
-     * @param name is the String name to be validated.
+     * Validates that the provided name is neither null nor empty.
+     * <p>
+     * This method ensures that names used for countries and capital cities contain at least one character.
+     * If the name is null or an empty string, an {@code IllegalArgumentException} is thrown.
+     * </p>
+     *
+     * @param name the name string to validate.
+     * @throws IllegalArgumentException if the name is null or empty.
      */
     private static void validateNames(final String name)
     {
@@ -84,8 +100,14 @@ class Country
     }
 
     /*
-     * validates String array facts used in Country class in the constructor.
-     * @param facts is the String array of facts to be validated.
+     * Validates that the provided facts array is neither null nor empty.
+     * <p>
+     * This method ensures that the country facts array is provided and contains at least one fact.
+     * If the array is {@code null} or has a length of zero, an {@code IllegalArgumentException} is thrown.
+     * </p>
+     *
+     * @param facts the array of facts to validate.
+     * @throws IllegalArgumentException if the facts array is null or empty.
      */
     private static void validateFacts(final String[] facts)
     {

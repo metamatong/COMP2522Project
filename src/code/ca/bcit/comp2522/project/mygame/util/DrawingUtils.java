@@ -127,8 +127,8 @@ public class DrawingUtils
      * Loads a text resource from the classpath and returns its content as an array of strings.
      * <p>
      * This method reads the specified resource file from the classpath line by line and returns an array of strings,
-     * where each string represents a line from the file. It can be used to load ASCII art logos or any other text-based resource.
-     * For example, to load the logo file, pass "/logo.txt", or to load the winning logo, pass "/winLogo.txt".
+     * where each string represents a line from the file. It can be used to load ASCII art logos or any other text-based
+     * resource. For example, to load the logo file, pass "/logo.txt", or to load the winning logo, pass "/winLogo.txt".
      * </p>
      *
      * @param resourcePath the path of the resource to load (e.g. "/logo.txt" or "/winLogo.txt")

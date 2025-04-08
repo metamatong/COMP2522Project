@@ -25,7 +25,24 @@ import java.util.stream.IntStream;
 import java.util.Arrays;
 
 /**
- * Concrete NumberGame that uses a BasicScoreboard for tracking stats and runs a JavaFX GUI.
+ * A concrete implementation of a Number Game that displays a graphical user interface (GUI) using JavaFX.
+ * <p>
+ * This class implements the {@link JavaFXGame} interface and extends {@link Application} to provide a standalone
+ * JavaFX application for the Number Game. The game involves placing randomly generated numbers in a grid
+ * while maintaining a strictly ascending order. The class manages the game board, user interactions via grid buttons,
+ * and updates to an embedded scoreboard to track wins, losses, and placements.
+ * </p>
+ * <p>
+ * The main features include:
+ * <ul>
+ *   <li>Setting up a grid-based UI with configurable rows and columns.</li>
+ *   <li>Random generation and shuffling of numbers for placement on the board.</li>
+ *   <li>Handling user input through button clicks with validation to maintain ascending order.</li>
+ *   <li>Displaying game status messages and a confirmation dialog when the game is over.</li>
+ *   <li>Delegating scoreboard updates (games played, wins, losses, and total placements) to a {@link BasicScoreboard}
+ *   instance.</li>
+ * </ul>
+ * </p>
  *
  * @author Kyle Cheon
  * @version 1.0
@@ -76,8 +93,21 @@ public class NumberGame extends Application
 
     /**
      * Sets up and displays the JavaFX UI for the Number Game.
+     * <p>
+     * This method initializes the main stage and scene with a grid-based layout. It sets up the following:
+     * <ul>
+     *   <li>A {@link GridPane} that arranges buttons corresponding to grid cells, where each button can receive user
+     *   input.</li>
+     *   <li>Labels to display the "next number" prompt and the current game status.</li>
+     *   <li>A layout hierarchy composed of a {@link VBox} and {@link HBox} for organizing the top and bottom UI
+     *   elements.</li>
+     *   <li>A stylesheet from "/styles.css" to define the UI's appearance.</li>
+     *   <li>An event handler for window close requests that triggers a custom shutdown routine.</li>
+     * </ul>
+     * Finally, the method calls {@link #resetGame()} to initialize a new game.
+     * </p>
      *
-     * @param primaryStage the main Stage for this JavaFX application
+     * @param primaryStage the primary stage provided by the JavaFX framework.
      */
     @Override
     public void start(final Stage primaryStage)
@@ -155,14 +185,15 @@ public class NumberGame extends Application
     }
 
     /**
-     * Starts the Number Game by creating a new JavaFX Stage and initializing the game UI.
+     * Starts the Number Game on a new Stage.
      * <p>
-     * This method assigns the provided {@code CountDownLatch} to the gameLatch field so that the game
-     * can signal its completion by counting down the latch when the game is over. A new stage is then
-     * created and passed to the {@link #start(Stage)} method to launch the game.
+     * This method is invoked when the game is launched via the {@link JavaFXGame} interface (for example,
+     * from a main menu). It assigns the provided {@link CountDownLatch} to enable external synchronization,
+     * creates a new stage, and calls {@link #start(Stage)} to initialize the game UI.
      * </p>
      *
-     * @param latch the {@link CountDownLatch} used to signal when the game is complete
+     * @param latch a {@link CountDownLatch} that will be decremented when the game window closes,
+     *              allowing any waiting external thread (such as a main menu) to resume.
      */
     @Override
     public void play(final CountDownLatch latch)
@@ -226,14 +257,18 @@ public class NumberGame extends Application
     // -------------
 
     /**
-     * Resets the game to a clean state:
+     * Resets the game state to start a new game.
+     * <p>
+     * This method performs the following steps:
      * <ul>
-     *     <li>Clears the board array.</li>
-     *     <li>Clears all button labels.</li>
-     *     <li>Resets relevant counters.</li>
-     *     <li>Generates a fresh random number to place first.</li>
-     *     <li>Increments 'games played' in the scoreboard.</li>
+     *   <li>Clears the board data by filling the board array with zeroes.</li>
+     *   <li>Clears all button labels in the grid.</li>
+     *   <li>Resets the counters for numbers placed and game-over flag.</li>
+     *   <li>Initializes the list of available numbers and shuffles them.</li>
+     *   <li>Generates the first random number to be placed and updates the corresponding UI label.</li>
+     *   <li>Increments the games played count in the scoreboard.</li>
      * </ul>
+     * </p>
      */
     public void resetGame()
     {
@@ -268,11 +303,22 @@ public class NumberGame extends Application
     }
 
     /**
-     * Main event handler for the grid buttons. Places the next number if valid,
-     * checks for ascending order, and updates the UI. If an invalid move is made,
-     * it will signal a loss. If the board is filled, it signals a win.
+     * Main event handler for grid button clicks.
+     * <p>
+     * This method is triggered whenever a grid button is clicked. It processes the move by:
+     * <ul>
+     *   <li>Determining the row and column of the clicked button.</li>
+     *   <li>Verifying that the corresponding board cell is empty.</li>
+     *   <li>Permanently placing the next random number if the move is valid.</li>
+     *   <li>Checking if the board numbers are in strictly ascending order; if not, the move is reverted and a loss is
+     *   signaled.</li>
+     *   <li>Updating the UI and game status accordingly, including checking win or loss conditions.</li>
+     * </ul>
+     * If the board is completely filled or a move violates the ascending order rule, the game is ended and the
+     * scoreboard is updated.
+     * </p>
      *
-     * @param event the event triggered by clicking on a grid Button.
+     * @param event the {@link ActionEvent} triggered by clicking on a grid button.
      */
     @Override
     public void handle(final ActionEvent event)
@@ -367,10 +413,15 @@ public class NumberGame extends Application
     // Helper Utilities
     // ----------------
 
+
     /*
-     * Generates a random integer in the range [1, NUMBER_UPPERBOUND].
+     * Generates and returns a random number from the available numbers list.
+     * <p>
+     * This method returns the next number from the shuffled list of available numbers.
+     * If all numbers have been used, it returns zero.
+     * </p>
      *
-     * @return a random integer from 1 to NUMBER_UPPERBOUND (inclusive)
+     * @return an integer representing the next random number, or zero if no numbers are left.
      */
     private int getRandomNumber()
     {
@@ -393,11 +444,14 @@ public class NumberGame extends Application
     }
 
     /*
-     * Checks whether the given array of integers (representing the board)
-     * is in strictly ascending order, ignoring zeroes.
+     * Determines if the board's non-zero entries are in strictly ascending order.
+     * <p>
+     * This method filters out zero values (empty cells) and then verifies that
+     * the remaining entries are in strictly increasing order.
+     * </p>
      *
-     * @param arr the board array to check
-     * @return true if all non-zero values are in strictly ascending order; false otherwise
+     * @param arr the board array to check.
+     * @return {@code true} if all non-zero numbers are in strictly ascending order; {@code false} otherwise.
      */
     private boolean isBoardAscending(final int[] arr)
     {
@@ -409,13 +463,15 @@ public class NumberGame extends Application
     }
 
     /*
-     * Tries placing a hypothetical number into each empty spot. If at least one
-     * placement leads to a strictly ascending board, then it's possible to place
-     * this number.
+     * Checks if there is at least one valid cell on the board where the next number can be placed.
+     * <p>
+     * This method attempts to hypothetically place the candidate number in every empty cell.
+     * If placing the number in any empty cell results in a strictly ascending board, then there is a valid move.
+     * </p>
      *
-     * @param n   the candidate number to place
-     * @param arr the board array
-     * @return true if there is at least one valid spot; false otherwise
+     * @param n   the candidate number to test.
+     * @param arr the board array.
+     * @return {@code true} if at least one valid placement exists; {@code false} otherwise.
      */
     private boolean canPlaceNextNumber(final int n,
                                        final int[] arr)
@@ -435,11 +491,14 @@ public class NumberGame extends Application
     }
 
     /*
-     * Shows a dialog indicating that the game is over, then asks the user if they want
-     * to reset or quit. If the user chooses "Try Again," a new game is started via
-     * resetGame(); otherwise, the application window is closed.
+     * Displays a game-over dialog prompting the user to try again or quit.
+     * <p>
+     * The method shows a confirmation dialog with a message derived from the current status.
+     * If the user selects "Try Again," the game is reset by calling {@link #resetGame()}. Otherwise, the primary stage
+     * is closed.
+     * </p>
      *
-     * @param stage the main stage on which to show the dialog
+     * @param stage the primary {@link Stage} on which to display the dialog.
      */
     private void showGameOverDialog(final Stage stage)
     {

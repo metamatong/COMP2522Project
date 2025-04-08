@@ -10,7 +10,23 @@ import java.nio.file.Paths;
 import java.io.IOException;
 
 /**
- * A class that represents the world with its consisting countries.
+ * Represents a world containing a collection of countries used in the game.
+ * <p>
+ * The {@code World} class loads country data from text files located in the "src/res/data/" directory.
+ * Each file is named with a lowercase letter (a–z) and may contain multiple country records. A country record
+ * is defined as a block of text lines where:
+ * <ul>
+ *   <li>The first line is a header in the format "CountryName:CapitalCityName".</li>
+ *   <li>The subsequent lines contain facts about the country.</li>
+ *   <li>A blank line indicates the end of a country record.</li>
+ * </ul>
+ * The parsed countries are stored in a map with the country name as the key and a corresponding {@link Country}
+ * object as the value.
+ * </p>
+ * <p>
+ * If any file is missing or if a country record is malformed, the class logs the error and skips the problematic
+ * record. After processing all files, the country map is validated to ensure it is not empty or null.
+ * </p>
  *
  * @author Kyle Cheon
  * @version 1.0
@@ -92,18 +108,28 @@ class World
     }
 
     /**
-     * A getter for countries stored in World object.
-     * @return a map of countries with String keys and Country object values
+     * Returns the map of countries loaded into this world.
+     * <p>
+     * Each entry in the map uses the country name as the key and its corresponding {@link Country} object as the value.
+     * </p>
+     *
+     * @return a map of country names to {@link Country} objects.
      */
     public Map<String, Country> getCountries()
     {
         return this.countries;
     }
 
+
     /*
-     * Validates the countries map used in the World constructor.
+     * Validates the provided countries map to ensure it is not null or empty and that its entries are valid.
+     * <p>
+     * This method checks if the map is {@code null} or empty, and then verifies that each key (country name)
+     * is not null or empty, and that each value (the {@link Country} object) is not null.
+     * </p>
      *
-     * @param countries is the Map of countries to be validated.
+     * @param countries the map of countries to validate.
+     * @throws IllegalArgumentException if the countries map is null, empty, or contains invalid entries.
      */
     private static void validateCountries(final HashMap<String, Country> countries)
     {
@@ -145,16 +171,20 @@ class World
     }
 
     /*
-     * A helper method to parse a block of lines representing a single country and add it to the map.
+     * Parses a block of text lines representing a single country's data and adds the resulting {@link Country} object
+     * to the specified countries map.
+     * <p>
+     * The block is expected to be formatted as follows:
+     * <ul>
+     *   <li>The first line (header) must be in the format "CountryName:CapitalCityName".</li>
+     *   <li>The subsequent lines contain facts about the country.</li>
+     * </ul>
+     * If the header line is malformed or any validation fails in the {@link Country} constructor,
+     * an error message is logged and the block is skipped.
+     * </p>
      *
-     * Expected block format:
-     *   CountryName:CapitalCityName
-     *   Fact 1
-     *   Fact 2
-     *   ...
-     *
-     * @param block        the list of lines for one country
-     * @param countriesMap the map to add the Country object to
+     * @param block        the list of text lines representing one country's data.
+     * @param countriesMap the map to which the parsed {@link Country} object should be added.
      */
     private static void addCountryFromBlock(final List<String> block,
                                             final Map<String, Country> countriesMap)

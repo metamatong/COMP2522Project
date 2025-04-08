@@ -2,12 +2,17 @@ package ca.bcit.comp2522.project.mygame.common;
 
 
 /**
- * A final class that contains configuration constants for the game.
+ * A final utility class that encapsulates configuration constants for the game.
  * <p>
- * This class defines various static constants used to configure the game grid dimensions,
- * cell size, canvas dimensions, margins, display statistics, finish line position, and the
- * movement cooldown duration.
+ * This class defines numerous static constants that determine various aspects of the game such as:
+ * grid dimensions, cell size, overall canvas dimensions, margin settings, player configurations,
+ * non-player character (NPC) movement behavior, finish line position, and movement cooldown durations.
+ * These constants are used throughout the game to ensure consistent configuration and behavior.
  * </p>
+ * <p>
+ * Note that this class cannot be instantiated.
+ * </p>
+ *
  * @author Kyle Cheon
  * @version 1.0
  */

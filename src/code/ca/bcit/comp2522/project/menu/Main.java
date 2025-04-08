@@ -10,7 +10,16 @@ import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * A class that drives users to play three games presented by this project.
+ * The {@code Main} class serves as the entry point for the application and provides a
+ * text-based menu interface from which users can select among three different games:
+ * WordGame, NumberGame, and MyGame (Red Light Blood Light). This class leverages JavaFX for
+ * concurrency and thread management while running the game selections on a separate console-based thread.
+ * <p>
+ * The class extends {@link Application} from JavaFX and overrides the {@code start} method to configure
+ * the application behavior and to prevent the JavaFX runtime from automatically exiting when a stage is closed.
+ * It uses the {@code Platform.runLater} method to ensure that game-related tasks are executed on the JavaFX
+ * Application Thread while the console menu interaction is handled in a dedicated thread.
+ * </p>
  *
  * @author Kyle Cheon
  * @version 1.0
@@ -23,10 +32,15 @@ public class Main extends Application
     private static final String QUIT_INITIAL = "Q";
     private static final int LATCH_COUNT_DOWN = 1;
 
+
     /**
-     * The main entry point of the application.
+     * The main entry point for the application.
+     * <p>
+     * This method is responsible for launching the JavaFX runtime which in turn invokes the overridden
+     * {@code start} method. Command-line arguments are passed to the JavaFX framework as needed.
+     * </p>
      *
-     * @param args the command line arguments
+     * @param args an array of command-line arguments passed to the application
      */
     public static void main(final String[] args)
     {
@@ -35,13 +49,15 @@ public class Main extends Application
     }
 
     /**
-     * Initializes the JavaFX application.
+     * Initializes the primary stage and sets up the application environment.
      * <p>
-     * This method sets the application to not exit when stages are
-     * closed and launches the main menu logic on a new thread.
+     * This method configures the JavaFX environment so that the application does not exit when a stage is closed,
+     * ensuring that the console-based main menu continues running. It creates and starts a new thread dedicated to
+     * processing the main menu logic, which enables asynchronous execution of non-GUI tasks alongside the JavaFX
+     * Application Thread.
      * </p>
      *
-     * @param primaryStage the primary stage for this application, onto which the application scene can be set.
+     * @param primaryStage the primary {@link Stage} for this application.
      */
     @Override
     public void start(final Stage primaryStage)
@@ -60,10 +76,17 @@ public class Main extends Application
     }
 
     /*
-     * Displays the main menu in the console and handles user input.
+     * Displays the main menu in the console and processes user input in a continuous loop.
      * <p>
-     * This method continuously presents the menu until the user chooses to quit.
-     * Based on the user's choice, it either launches a game or exits the application.
+     * The menu provides options to launch one of three games or to exit the application:
+     * <ul>
+     *   <li>{@code "W"}: Launches the Word game.</li>
+     *   <li>{@code "N"}: Launches the Number game (a game that uses the JavaFX thread via {@code launchGame}).</li>
+     *   <li>{@code "M"}: Launches the MyGame (Red Light Blood Light) using the JavaFX thread.</li>
+     *   <li>{@code "Q"}: Quits the application.</li>
+     * </ul>
+     * After a game finishes executing, the method prints a message confirming return from the game and re-displays
+     * the menu.
      * </p>
      */
     private void displayMainMenu()
@@ -115,10 +138,17 @@ public class Main extends Application
     }
 
     /*
-     * Launches a game that uses JavaFX. The game must implement the Game interface,
-     * meaning it should provide a play(CountDownLatch latch) method that counts down the latch when finished.
-     * This design is necessary to ensure that main menu runs again after exiting each game that runs on JavaFX
-     * Application Thread.
+     * Launches a JavaFX-based game and waits for its completion before returning to the main menu.
+     * <p>
+     * The method accepts any game that implements the {@code JavaFXGame} interface. The game is expected to
+     * implement a {@code play(CountDownLatch latch)} method. This method schedules the game’s execution on
+     * the JavaFX Application Thread using {@link Platform#runLater}, ensuring thread-safety for GUI operations.
+     * A {@link CountDownLatch} is used to pause the main menu thread until the game signals that it has finished.
+     * </p>
+     *
+     * @param javaFXGame an instance of a game that implements the {@code JavaFXGame} interface and encapsulates
+     *                   JavaFX-based gameplay logic
+     * @throws RuntimeException if the waiting thread is interrupted while waiting for the game to finish
      */
     private void launchGame(final JavaFXGame javaFXGame)
     {

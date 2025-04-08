@@ -1,7 +1,15 @@
 package ca.bcit.comp2522.project.numbergame;
 
 /**
- * Interface providing methods for game stats.
+ * The {@code NumberGameStats} interface defines a contract for tracking and reporting
+ * statistical data related to a number-based game. Implementations of this interface are
+ * responsible for maintaining counts of games played, wins, losses, and placements, as well
+ * as providing calculations (such as the average placements per game) and generating a formatted
+ * summary of the overall game performance.
+ * <p>
+ * Typical implementations might be used to provide a scoreboard that is updated after each game,
+ * allowing for historical performance tracking over multiple sessions.
+ * </p>
  *
  * @author Kyle Cheon
  * @version 1.0

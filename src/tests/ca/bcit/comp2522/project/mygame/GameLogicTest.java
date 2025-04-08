@@ -17,17 +17,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A comprehensive JUnit 5 test class that verifies the core gameplay logic in GameLogic,
- * along with simple smoke tests for SoundManager and GameRenderer.
+ * A comprehensive JUnit 5 test class that verifies the core functionality of the game logic,
+ * along with basic smoke tests for the sound and UI rendering components.
+ * <p>
+ * This class performs the following verifications:
+ * <ul>
+ *   <li>Initialization: Checks that the game logic correctly instantiates and initializes
+ *       the required number of players and assigns the user-controlled player.</li>
+ *   <li>Movement: Verifies that players move correctly when a move is attempted and enforces
+ *       a move cooldown period to prevent immediate successive moves.</li>
+ *   <li>Light State and Win Condition: Tests that updating the game state toggles light state appropriately
+ *       and that a win is detected when the user reaches the finish line.</li>
+ *   <li>Sound and UI: Confirms that methods of the SoundManager and GameRenderer do not throw errors when invoked.</li>
+ *   <li>Singleton Pattern: Ensures that a valid SoundManager creates a non-null GameLogic instance.</li>
+ *   <li>Cooldown Enforcement: Checks that move attempts made before the cooldown expires are rejected.</li>
+ * </ul>
+ * Additionally, the class initializes the JavaFX runtime before running any tests to allow the use of JavaFX classes.
+ * </p>
+ *
+ * @author Kyle Cheon
+ * @version 1.0
  */
 public class GameLogicTest {
 
-    // Initialize JavaFX toolkit (required for JavaFX classes such as Canvas and GraphicsContext)
-    @BeforeAll
+    /**
+     * Initializes the JavaFX toolkit. This is required for using JavaFX classes (such as Canvas and GraphicsContext)
+     * within the test methods.
+     */    @BeforeAll
     static void initJavaFX() {
         new JFXPanel(); // This initializes the JavaFX runtime.
     }
 
+    /**
+     * Tests that the {@code initGame()} method creates the expected number of players and properly sets the
+     * user-controlled player.
+     */
     @Test
     void testInitGameCreatesPlayers() {
         SoundManager sm = new SoundManager();
@@ -41,6 +65,10 @@ public class GameLogicTest {
         assertTrue(user.isUser(), "The first player should be marked as user.");
     }
 
+    /**
+     * Tests that a player is successfully moved by {@code tryMoveWithPush()} and that move cooldowns prevent
+     * immediate repeated moves.
+     */
     @Test
     void testTryMoveWithPushMovesPlayer() {
         SoundManager sm = new SoundManager();
@@ -65,6 +93,10 @@ public class GameLogicTest {
         assertFalse(movedAgain, "A second immediate move should fail due to move cooldown.");
     }
 
+    /**
+     * Tests that the light switching logic within {@code updateGame()} maintains its state when updates occur rapidly,
+     * and that the method behaves correctly when sufficient time has elapsed.
+     */
     @Test
     void testLightSwitchTogglingViaUpdateGame() {
         SoundManager sm = new SoundManager();
@@ -89,6 +121,9 @@ public class GameLogicTest {
         assertNotNull(gl.isGreen(), "After a long delay, the light state is defined.");
     }
 
+    /**
+     * Tests that the win condition is correctly detected when the user-controlled player reaches the finish line.
+     */
     @Test
     void testUserWinCondition() {
         SoundManager sm = new SoundManager();
@@ -104,19 +139,29 @@ public class GameLogicTest {
         assertTrue(gl.isGameOver(), "Game should be over after the user finishes.");
     }
 
+    /**
+     * Smoke tests for the {@code SoundManager} methods to ensure they execute without exceptions.
+     */
     @Test
     void testSoundManagerMethods() {
         SoundManager sm = new SoundManager();
-        assertDoesNotThrow(() -> sm.playPushSound(), "playPushSound() should run without throwing an exception.");
-        assertDoesNotThrow(() -> sm.playGunshotSound(), "playGunshotSound() should run without throwing an exception.");
-        assertDoesNotThrow(() -> sm.playDeathSound1(), "playDeathSound1() should run without throwing an exception.");
-        assertDoesNotThrow(() -> sm.playDeathSound2(), "playDeathSound2() should run without throwing an exception.");
+        assertDoesNotThrow(() -> sm.playPushSound(), "playPushSound() should not throw an exception.");
+        assertDoesNotThrow(() -> sm.playGunshotSound(), "playGunshotSound() should not throw an exception.");
+        assertDoesNotThrow(() -> sm.playDeathSound1(), "playDeathSound1() should not throw an exception.");
+        assertDoesNotThrow(() -> sm.playDeathSound2(), "playDeathSound2() should not throw an exception.");
         assertDoesNotThrow(() -> {
             sm.playBGM();
             sm.stopBGM();
         }, "playBGM() and stopBGM() should run without throwing an exception.");
     }
 
+    /**
+     * Smoke tests for the {@code GameRenderer}'s render method.
+     * <p>
+     * This test verifies that rendering each game state (INTRO, GAME, GAME_OVER)
+     * does not throw an exception.
+     * </p>
+     */
     @Test
     void testGameRendererRenderDoesNotThrow() {
         SoundManager sm = new SoundManager();

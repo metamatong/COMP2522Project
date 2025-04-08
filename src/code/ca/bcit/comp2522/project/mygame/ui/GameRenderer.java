@@ -21,12 +21,20 @@ import static ca.bcit.comp2522.project.mygame.util.DrawingUtils.computeTextWidth
 import static ca.bcit.comp2522.project.mygame.util.DrawingUtils.putSafeString;
 
 /**
- * Draws the user interface for the game.
+ * The {@code GameRenderer} class is responsible for drawing the entire user interface (UI) of the game.
  * <p>
- * This class is responsible for rendering the different screens and UI elements of the game,
- * including the intro screen, in-game display (with player sprites, statistics, and light machines),
- * and the game over screen. It uses a {@link GameLogic} instance to obtain game state information and
- * renders the graphics using a JavaFX {@link GraphicsContext}.
+ * It renders a variety of screens depending on the current game state, including:
+ * <ul>
+ *   <li><b>Intro Screen:</b> Shows the game logo, title, and instructions for starting or exiting the game.</li>
+ *   <li><b>In-Game Screen:</b> Displays real-time game statistics, player sprites, the finish line, and visual
+ *       representations of the current light state (green or red), along with a light machine illustration.</li>
+ *   <li><b>Game Over Screen:</b> Presents a game over message that adapts based on whether the user is eliminated
+ *       or has won, and provides instructions for restarting or exiting the game.</li>
+ * </ul>
+ * To achieve this, the class uses a JavaFX {@link GraphicsContext} for low-level rendering operations and relies on a
+ * {@link GameLogic} instance to obtain current game state information. Additionally, helper methods from
+ * {@code DrawingUtils} are employed to load asset resources (like logo text files) and perform safe drawing of ASCII
+ * art and text strings.
  * </p>
  *
  * @author Kyle Cheon
@@ -59,13 +67,17 @@ public class GameRenderer
     private final GameLogic<Player> gameLogic;
 
     /**
-     * Constructs a new GameRenderer with the specified GameLogic instance.
+     * Constructs a new {@code GameRenderer} with the specified {@link GameLogic} instance.
      * <p>
-     * This constructor attempts to load the logo assets for the intro and winning screens using
-     * the {@link DrawingUtils}. If the assets cannot be loaded, fallback default strings are used.
+     * The constructor initializes the renderer by validating and storing the provided {@code GameLogic} reference.
+     * It then attempts to load logo assets for both the introductory and winning screens via the utility method
+     * {@link DrawingUtils#loadResource(String)}. If the logo assets cannot be loaded (e.g., due to an
+     * {@link IOException}), the constructor falls back to default string arrays, ensuring that the UI can still
+     * display meaningful visuals.
      * </p>
      *
-     * @param gameLogic the GameLogic instance used to retrieve game state information.
+     * @param gameLogic the {@link GameLogic} instance used to retrieve game state information and drive UI updates.
+     * @throws IllegalArgumentException if {@code gameLogic} is {@code null}.
      */
     public GameRenderer(final GameLogic<Player> gameLogic)
     {
@@ -98,14 +110,16 @@ public class GameRenderer
     }
 
     /**
-     * Renders the game screen based on the current game state.
+     * Renders the game screen based on the current {@link GameState}.
      * <p>
-     * Depending on the provided {@code state}, this method delegates to one of the specific
-     * screen drawing methods: intro screen, in-game screen, or game over screen.
+     * This method acts as a controller that selects which screen to render by delegating the drawing operation
+     * to one of the specialized methods: {@link #drawIntroScreen(GraphicsContext)} for the introductory screen,
+     * {@link #drawGame(GraphicsContext)} for the in-game display, or {@link #drawGameOverScreen(GraphicsContext)} for
+     * the game over screen.
      * </p>
      *
      * @param state the current game state.
-     * @param gc    the GraphicsContext used for drawing.
+     * @param gc    the {@link GraphicsContext} used for performing drawing operations.
      */
     public void render(final GameState state,
                        final GraphicsContext gc)
@@ -125,13 +139,17 @@ public class GameRenderer
     }
 
     /*
-     * Draws the intro screen.
+     * Draws the introductory screen.
      * <p>
-     * This method clears the canvas, draws the intro logo, title, and user instructions
-     * for starting or exiting the game.
+     * This method clears the entire canvas and draws the introductory view, which includes:
+     * <ul>
+     *   <li>The ASCII art logo loaded from resources (or fallback content) rendered using a scaled font.</li>
+     *   <li>A composed title combining multiple colored text segments to emphasize the game's theme.</li>
+     *   <li>User instructions for starting or exiting the game.</li>
+     * </ul>
      * </p>
      *
-     * @param gc the GraphicsContext used for drawing.
+     * @param gc the {@link GraphicsContext} to use for drawing.
      */
     private void drawIntroScreen(final GraphicsContext gc)
     {
@@ -216,13 +234,15 @@ public class GameRenderer
     }
 
     /*
-     * Draws the in-game screen.
+     * Draws the in-game screen with statistics, the light machine, finish line, and player sprites.
      * <p>
-     * This method clears the previous game statistics, calculates the elapsed time and dead player count,
-     * and then renders the game statistics, light machine (red or green), finish line, and player sprites.
+     * This method computes real-time statistics (elapsed time, finished count, dead count),
+     * clears relevant canvas areas, and renders the game field. It determines the current light state
+     * to draw either a red or green light machine, draws the finish line across the canvas, and iterates through
+     * all players to display their active or eliminated sprites.
      * </p>
      *
-     * @param gc the GraphicsContext used for drawing.
+     * @param gc the {@link GraphicsContext} used for drawing the in-game screen.
      */
     private void drawGame(final GraphicsContext gc)
     {
@@ -310,11 +330,13 @@ public class GameRenderer
     /*
      * Draws the game over screen.
      * <p>
-     * Depending on whether the user is eliminated or wins the game, this method draws the corresponding
-     * game over message and logos, as well as instructions for replaying or exiting the game.
+     * This method clears the canvas and then draws an appropriate game over message based on whether the user is
+     * eliminated. For an eliminated user, a simple text message is shown. If the user wins, the method displays a
+     * winning logo (loaded from resources or defaulted) and additional win messages, along with instructions for
+     * replaying or exiting the game.
      * </p>
      *
-     * @param gc the GraphicsContext used for drawing.
+     * @param gc the {@link GraphicsContext} used for drawing the game over screen.
      */
     private void drawGameOverScreen(final GraphicsContext gc)
     {
@@ -514,14 +536,15 @@ public class GameRenderer
     }
 
     /*
-     * Draws a player's sprite.
+     * Draws a live player's sprite.
      * <p>
-     * This method draws the sprite for a player. For the user-controlled player, it shows a different color
-     * and may display additional visual cues if the player is pushing or being pushed.
+     * This method renders the sprite for a player by choosing different visual representations based on the player's
+     * state. If the player is controlled by the user and is in a pushing or being pushed state, corresponding special
+     * rendering is performed. Otherwise, a standard multi-line ASCII sprite is drawn.
      * </p>
      *
-     * @param gc the GraphicsContext used for drawing.
-     * @param p  the Player whose sprite is to be drawn.
+     * @param gc the {@link GraphicsContext} used for drawing.
+     * @param p  the {@link Player} whose sprite is to be rendered.
      */
     private void drawPlayerSprite(final GraphicsContext gc,
                                   final Player p)

@@ -33,14 +33,27 @@ import static ca.bcit.comp2522.project.mygame.common.GameConfig.TOP_MARGIN_IN_PI
 import static ca.bcit.comp2522.project.mygame.util.DrawingUtils.directionDeltaX;
 import static ca.bcit.comp2522.project.mygame.util.DrawingUtils.directionDeltaY;
 
+
 /**
- * The main class for the "Red Light Green Light" game.
+ * The {@code MyGame} class is the primary entry point for the "Red Light Green Light" game.
  * <p>
  * This class extends {@link Application} and implements the {@link JavaFXGame} interface,
- * managing the game window, game loop, user input, and rendering.
- * It handles game state transitions between intro, gameplay, and game over screens,
- * and integrates with game logic, sound, and UI rendering.
+ * combining the JavaFX application lifecycle with custom game logic. It is responsible for initializing
+ * the game window, configuring the scene and canvas, processing user input (keyboard events), and managing
+ * the game loop via an {@link AnimationTimer}. The class orchestrates transitions between different game
+ * states (such as the intro screen, active gameplay, and game over screen) and integrates with components
+ * that handle game logic, sound, and UI rendering.
  * </p>
+ * <p>
+ * Key features include:
+ * <ul>
+ *   <li>Setting up the stage and canvas for drawing game graphics.</li>
+ *   <li>Managing user input to trigger game state changes and in-game movements.</li>
+ *   <li>Running a game loop that periodically updates game logic and renders the UI.</li>
+ *   <li>Controlling background music based on game conditions.</li>
+ * </ul>
+ * </p>
+ *
  * @author Kyle Cheon
  * @version 1.0
  */
@@ -74,11 +87,22 @@ public class MyGame
     /**
      * Initializes and starts the game.
      * <p>
-     * This method sets up the primary stage, scene, canvas, and key event handlers,
-     * initializes the game logic and rendering components, and starts the game loop.
+     * This method is called by the JavaFX framework when the application launches.
+     * It performs the following tasks:
+     * <ul>
+     *   <li>Stores the primary stage and sets up a custom close request handler.</li>
+     *   <li>Initializes the {@link SoundManager} and {@link GameLogic}, and creates an instance
+     *       of {@link GameRenderer} for handling UI drawing.</li>
+     *   <li>Creates the canvas and scene, applying any required stylesheets.</li>
+     *   <li>Registers key event handlers to handle user input across different game states:
+     *       starting the game, moving the user-controlled player, or exiting the game.</li>
+     *   <li>Configures initial timing values for game logic updates and light switching.</li>
+     *   <li>Creates and starts the main game loop using {@link AnimationTimer} to continuously
+     *       update game logic and render the current game state.</li>
+     * </ul>
      * </p>
      *
-     * @param primaryStage the primary stage for this application.
+     * @param primaryStage the primary {@link Stage} for this application.
      */
     @Override
     public void start(final Stage primaryStage)
@@ -234,14 +258,15 @@ public class MyGame
     }
 
     /**
-     * Plays the game on a new stage.
+     * Starts the game on a new stage.
      * <p>
-     * This method is part of the {@link JavaFXGame} interface, allowing the game to be launched
-     * from another context (e.g., a main menu). It sets up a new stage and starts the game.
+     * This method is part of the {@link JavaFXGame} interface, enabling the game to be launched
+     * from an external context (such as a main menu) by creating a new stage. When the game window
+     * is closed, a {@link CountDownLatch} (if provided) will be decremented to unblock any waiting threads.
      * </p>
      *
-     * @param latch a {@link CountDownLatch} that will be decremented when the game window is closed,
-     *              unblocking the main menu thread.
+     * @param latch a {@link CountDownLatch} that will be decremented when the game window closes,
+     *              allowing external processes (e.g., main menu) to resume execution.
      */
     @Override
     public void play(final CountDownLatch latch)
@@ -255,8 +280,9 @@ public class MyGame
     /**
      * Stops the game.
      * <p>
-     * This method is called when the application is stopped and ensures that the game loop is halted
-     * and background music is stopped.
+     * This method is automatically invoked when the application is stopped. It stops the active game loop
+     * and halts any background music, ensuring that all resources are properly released and the game state is
+     * gracefully terminated.
      * </p>
      */
     @Override
@@ -272,8 +298,14 @@ public class MyGame
     /*
      * Closes the game window.
      * <p>
-     * This method stops the game loop and background music, counts down the latch (if present)
-     * to unblock the main menu thread, and closes the game stage.
+     * This helper method is invoked when a user opts to exit the game (or when the window's close request is
+     * triggered). It performs the following actions:
+     * <ul>
+     *   <li>Stops background music and the game loop.</li>
+     *   <li>Decrements the {@link CountDownLatch} if one is present, unblocking any waiting threads (such as a main
+     *   menu).</li>
+     *   <li>Closes the primary game stage, effectively terminating the UI.</li>
+     * </ul>
      * </p>
      */
     private void closeGameWindow()

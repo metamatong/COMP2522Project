@@ -12,10 +12,21 @@ import java.util.List;
 
 /**
  * Represents the score details of a word game session.
- * This class tracks the date/time the session was played, how many games
- * were played, the number of correct attempts (first and second),
- * and the number of incorrect attempts. It also provides a method
- * to calculate an average score based on these details.
+ * <p>
+ * This class tracks comprehensive statistical data for a word game session, including:
+ * <ul>
+ *   <li>The date and time the session was recorded.</li>
+ *   <li>The total number of games played during the session.</li>
+ *   <li>The number of questions answered correctly on the first attempt (weighted more heavily).</li>
+ *   <li>The number of questions answered correctly on the second attempt.</li>
+ *   <li>The number of questions answered incorrectly after two attempts.</li>
+ * </ul>
+ * The total score is computed using a weighting factor for first-attempt correctness, and an average score
+ * is derived from the total score divided by the number of games played.
+ * <p>
+ * This class also provides utility methods to serialize (append) score details to a file and to read
+ * previously recorded scores from a file.
+ * </p>
  *
  * @author Kyle Cheon
  * @version 1.0
@@ -32,19 +43,25 @@ public class Score
     private int numIncorrectTwoAttempts;
 
     /**
-     * Constructs a Score object with the specified values.
+     * Constructs a new {@code Score} object with the specified parameters.
+     * <p>
+     * The provided values represent the statistical data for a game session.
+     * The {@code currentTime} parameter records when the score was captured.
+     * Other parameters track the number of games played, correct attempts (on the first and second tries),
+     * and incorrect attempts, which will be used to compute the final score.
+     * </p>
      *
-     * @param currentTime             the date and time when this score was recorded
-     * @param numGamesPlayed          the total number of games played
-     * @param numCorrectFirstAttempts the number of questions answered correctly on the first attempt
-     * @param numCorrectSecondAttempts the number of questions answered correctly on the second attempt
-     * @param numIncorrectTwoAttempts  the number of questions answered incorrectly after two attempts
+     * @param currentTime              the date and time when this score was recorded.
+     * @param numGamesPlayed           the total number of games played.
+     * @param numCorrectFirstAttempts  the number of questions answered correctly on the first attempt.
+     * @param numCorrectSecondAttempts the number of questions answered correctly on the second attempt.
+     * @param numIncorrectTwoAttempts  the number of questions answered incorrectly after two attempts.
      */
     public Score(final LocalDateTime currentTime,
-          final int numGamesPlayed,
-          final int numCorrectFirstAttempts,
-          final int numCorrectSecondAttempts,
-          final int numIncorrectTwoAttempts)
+                 final int numGamesPlayed,
+                 final int numCorrectFirstAttempts,
+                 final int numCorrectSecondAttempts,
+                 final int numIncorrectTwoAttempts)
     {
         this.currentTime = currentTime;
         this.numGamesPlayed = numGamesPlayed;
@@ -54,15 +71,16 @@ public class Score
     }
 
     /**
-     * Calculates and returns the total score based on the current
-     * session data. The calculation uses a weighting factor for first
-     * attempts.
+     * Calculates and returns the total score for this game session.
      * <p>
-     * The formula is:
-     * WEIGHT_FOR_FIRST_CORRECT_ATTEMPTS * numCorrectFirstAttempts + numCorrectSecondAttempts
+     * The score is calculated using the formula:
+     * <pre>
+     *    totalScore = (WEIGHT_FOR_FIRST_CORRECT_ATTEMPTS * numCorrectFirstAttempts) + numCorrectSecondAttempts
+     * </pre>
+     * The weighting factor emphasizes the importance of correct answers on the first attempt.
+     * </p>
      *
-     *
-     * @return the total score for this session
+     * @return the total score computed for this session.
      */
     public int getScore()
     {
@@ -133,14 +151,15 @@ public class Score
     }
 
     /**
-     * Appends the score details to the specified file.
+     * Appends the score details to a file at the specified path.
      * <p>
-     * The score is appended in a human-readable format, including the date/time,
-     * games played, correct attempts, incorrect attempts, and total score.
+     * The score details are written in a human-readable format that includes the session date/time,
+     * games played, counts of correct and incorrect attempts, and the total score.
+     * If the file does not exist, it is created. Each appended score record is separated by a new line.
      * </p>
      *
-     * @param score         the Score object containing the score details
-     * @param scoreFilePath the file path to which the score will be appended
+     * @param score         the {@code Score} object containing the session details.
+     * @param scoreFilePath the file system path to which the score should be appended.
      */
     public static void appendScoreToFile(final Score score,
                                          final String scoreFilePath)
@@ -183,23 +202,24 @@ public class Score
     }
 
 
+
     /**
-     * Reads the score details from the specified file (given by its path) and returns them as a list of Score objects.
+     * Reads score records from a file and returns them as a list of {@code Score} objects.
      * <p>
-     * The file is expected to contain scores in the following format (one record per block):
+     * The file is expected to contain multiple score records formatted as follows:
      * <pre>
-     * Date and Time: {@value #DATE_FORMAT}
+     * Date and Time: yyyy-MM-dd HH:mm:ss
      * Games Played: [number]
      * Correct First Attempts: [number]
      * Correct Second Attempts: [number]
      * Incorrect Attempts: [number]
      * Total Score: [number] points
      * </pre>
-     * Blank lines between records are ignored.
+     * Blank lines and non-conforming blocks are ignored.
      * </p>
      *
-     * @param scoreFilePath the path to the file from which to read the scores
-     * @return a list of Score objects read from the file
+     * @param scoreFilePath the path to the file from which to read the scores.
+     * @return a {@code List} of {@code Score} objects read from the file; an empty list if the file is not found or no records exist.
      */
     public static List<Score> readScoresFromFile(final String scoreFilePath)
     {
